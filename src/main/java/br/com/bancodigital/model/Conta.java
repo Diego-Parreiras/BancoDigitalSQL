@@ -1,6 +1,7 @@
 package br.com.bancodigital.model;
 
-import jakarta.persistence.Entity;
+import br.com.bancodigital.model.enuns.TipoConta;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,14 @@ import lombok.NoArgsConstructor;
 public class Conta {
     private long numero;
     private long agencia;
-    private String senha;
+    private long senha;
     private double saldo;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private long idCliente;
+    @ManyToOne
+    @JoinColumn(name = "id_cliente")
+    private Cliente cliente;
     private String chavePix;
+    private TipoConta tipoConta;
 }

@@ -1,10 +1,8 @@
 package br.com.bancodigital.model;
 
 import br.com.bancodigital.model.enuns.TipoCliente;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,16 +15,21 @@ import java.util.List;
 @Data
 @Entity
 public class Cliente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     private String nome;
     private String cpf;
+
+    @OneToOne
+    @JoinColumn(name = "id_endereco")
     private Endereco endereco;
-    private Date data;
+    private String dataNascimento;
     private TipoCliente tipo;
+
+    @OneToMany(mappedBy = "cliente")
     private List<Conta> contas;
-    private String senha;
 
 
 }

@@ -1,136 +1,189 @@
 package br.com.bancodigital.service;
 
 import br.com.bancodigital.dao.ContaDao;
+import br.com.bancodigital.dao.TransferenciaDao;
 import br.com.bancodigital.model.Conta;
 import br.com.bancodigital.model.Transferencia;
+import br.com.bancodigital.model.dto.TransferenciaPixRequest;
+import br.com.bancodigital.model.dto.TransferenciaTedRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class ContaService {
 
     @Autowired
-    private ContaDao contaDao;                              //injecao de dependencia
+    private ContaDao contaDao;
 
-    public void sacar(Long id, double valor) {
-        valorMaiorQueZero(valor);                           //verifica de o valor nao e menor que zero
-        Optional<Conta> contaOptional = buscarConta(id);    //verifica se a conta existe
-        if (contaOptional.isPresent()) {                    //se a conta existir
-            Conta conta = contaOptional.get();              //pega a conta
-            valorSuficiente(conta, valor);                  //verifica se tem saldo suficiente
-            conta.setSaldo(conta.getSaldo() - valor);       //diminui o saldo
-            contaDao.save(conta);                           //salva a conta
+    @Autowired
+    private TransferenciaDao transferenciaDao;
+
+    private final Random random = new Random();
+
+    public void criarConta(Conta conta) {
+        verificarContaExiste(conta);
+        popularDadosConta(conta);
+        contaDao.save(conta);
+    }
+
+    private void popularDadosConta(Conta conta) {
+        conta.setSaldo(0);
+        conta.setNumero(random.nextInt(900000) + 100000);
+        conta.setAgencia(1221);
+        String regexCPF="\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}";
+        if(conta.getChavePix()==null || conta.getChavePix().isEmpty()||!conta.getChavePix().matches(regexCPF)){
+            conta.setChavePix(generateChavePix(30));
+        }
+    }
+
+    private String generateChavePix(int i) {
+        final String CARACTERES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder();
+        for (int j = 0; j < i; j++) {
+            int index = random.nextInt(CARACTERES.length());
+            sb.append(CARACTERES.charAt(index));
+        }
+        return sb.toString();
+    }
+
+    @Transactional
+    public Transferencia transferenciaPix(TransferenciaPixRequest request){
+        varificarValor(request.getValor());
+        Optional<Conta> contaOrigemOptional = buscarConta(request.getIdContaOrigem());
+        if(contaOrigemOptional.isPresent()) {
+            verificarSaldo(contaOrigemOptional.get().getSaldo(), request.getValor());
+
+            Optional<Conta> contaDestinoOptional = buscarConta(buscarIdConta(request.getChavePix()));
+            if(contaDestinoOptional.isPresent()) {
+
+                if(contaOrigemOptional.get().getSenha() != request.getSenha()){
+                    throw new RuntimeException("Senha incorreta");
+                }
+                sacar(contaOrigemOptional.get().getId(), request.getValor());
+                depositar(contaDestinoOptional.get().getId(), request.getValor());
+
+                return registrarTransferencia(request.getIdContaOrigem(), contaDestinoOptional.get().getId(), request.getValor());
+            }
+            throw new RuntimeException("ContaDestino não encontrada");
+        }
+        throw new RuntimeException("ContaOrigem não encontrada");
+    }
+    @Transactional
+    public Transferencia transferenciaTed(TransferenciaTedRequest request){
+        varificarValor(request.getValor());
+        Optional<Conta> contaOrigemOptional = buscarConta(request.getIdOrigem());
+        if(contaOrigemOptional.isPresent()) {
+            verificarSaldo(contaOrigemOptional.get().getSaldo(), request.getValor());
+
+            Optional<Conta> contaDestinoOptional = buscarConta(buscarIdConta(request.getAgenciaDestino(), request.getNumeroContaDestino()));
+            if(contaDestinoOptional.isPresent()) {
+                if(contaOrigemOptional.get().getSenha() != request.getSenha()){
+                    throw new RuntimeException("Senha incorreta");
+                }
+
+                sacar(contaOrigemOptional.get().getId(), request.getValor());
+                depositar(contaDestinoOptional.get().getId(), request.getValor());
+
+                return registrarTransferencia(request.getIdOrigem(), contaDestinoOptional.get().getId(), request.getValor());
+            }
+            throw new RuntimeException("ContaDestino não encontrada");
+        }
+        throw new RuntimeException("ContaOrigem não encontrada");
+    }
+
+    public void fecharConta(Long id) {
+        Optional<Conta> conta = buscarConta(id);
+        if (conta.isPresent()) {
+            verificarContaExiste(conta.get());
+            if(conta.get().getSaldo()!=0) {
+                contaDao.deleteById(id);
+            }
+            else{
+                throw new RuntimeException("Conta com saldo não pode ser fechada");
+            }
+        }
+    }
+    public double exibirSaldo(Long id) {
+        Optional<Conta> conta = buscarConta(id);
+        if (conta.isPresent()) {
+            return conta.get().getSaldo();
         }
         throw new RuntimeException("Conta não encontrada");
     }
 
-    public double depositar(Long id, double valor) {        //metodo para depositar
-        valorMaiorQueZero(valor);                           //verifica se o valor nao e menor que zero
-        Optional<Conta> contaOptional = buscarConta(id);    //verifica se a conta existe
-        if (contaOptional.isPresent()) {                    //se a conta existir
-            Conta conta = contaOptional.get();              //pega a conta
-            conta.setSaldo(conta.getSaldo() + valor);       //adiciona o saldo
-            contaDao.save(conta);                           //salva a conta
-            return conta.getSaldo();                        //retorna o saldo
-
-        }
-        throw new RuntimeException("Conta não encontrada"); //se a conta nao existir
-    }
-
-    public Transferencia transferenciaPix(Long idOrigem, String chavePix, double valor) {   //metodo para transferencia pix
-        valorMaiorQueZero(valor);                                                           //verifica se o valor nao e menor que zero
-        Optional<Conta> contaOrigemOptional = buscarConta(idOrigem);                        //verifica se a conta origem existe
-        if (contaOrigemOptional.isPresent()) {                                              //se a conta origem existir
-            valorSuficiente(contaOrigemOptional.get(), valor);                              //verifica se tem saldo suficiente
-
-            Optional<Conta> contaDestinoOptional = buscarConta(buscaridConta(chavePix));    //verifica se a conta destino existe
-            if (contaDestinoOptional.isPresent()) {                                         //se a conta destino existir
-                return contaDao.transferir(idOrigem, contaDestinoOptional.get().getId(), valor);//retorna a transferencia
-            }
-            throw new RuntimeException("Conta destino não encontrada");                     //se a conta destino nao existir
-        }
-        throw new RuntimeException("Conta origem não encontrada");                          //se a conta origem nao existir
-    }
-
-    public Transferencia transferenciaTed(Long idOrigem, Long agencia, Long numero, double valor) {//metodo para transferencia por ted
-        valorMaiorQueZero(valor);                                                          //verifica se o valor nao e menor que zero
-        Optional<Conta> contaOrigemOptional = buscarConta(idOrigem);                       //verifica se a conta origem existe
-        if (contaOrigemOptional.isPresent()) {                                              //se a conta origem existir
-            valorSuficiente(contaOrigemOptional.get(), valor);                              //verifica se tem saldo suficiente
-
-            Optional<Conta> contaDestinoOptional = buscarConta(buscaridConta(agencia, numero)); //verifica se a conta destino existe
-            if (contaDestinoOptional.isPresent()) {                                             //se a conta destino existir
-                return contaDao.transferir(idOrigem, contaDestinoOptional.get().getId(), valor);//retorna a transferencia
-            }
-            throw new RuntimeException("Conta destino não encontrada");                     //se a conta destino nao existir
-        }
-        throw new RuntimeException("Conta origem não encontrada");                          //se a conta origem nao existir
-    }
-
-    public double verSaldo(Long id) {                            //metodo para ver o saldo
-        Optional<Conta> conta = buscarConta(id);                 //verifica se a conta existe
-        if (conta.isPresent()) {                                 //se a conta existir
-            return conta.get().getSaldo();                       //retorna o saldo
-        }
-        throw new RuntimeException("Conta não encontrada");      //se a conta nao existir
-    }
-
-    public void criarConta(Conta conta) {                       //metodo para criar uma conta
-        verificarContaExiste(conta);                            //verifica se a conta ja existe
-        contaDao.save(conta);                                   //salva a conta
-    }
-
-    public void deletarConta(Long id) {                         //metodo para deletar uma conta
-        Optional<Conta> conta = buscarConta(id);                //verifica se a conta existe
-        if (conta.isPresent()) {                                //se a conta existir
-            verificarContaExiste(conta.get());                  //verifica se a conta ja existe
-            if (conta.get().getSaldo() == 0) {                  //se o saldo da conta for zero
-                contaDao.deleteById(id);                        //deletar a conta
-            } else {                                            //se o saldo da conta nao for zero
-                throw new RuntimeException("Sua conta não pode ser deletada"); //exibe uma mensagem de erro caso o saldo nao seja zero
-            }
+    public void depositar(Long id, double valor) {
+        varificarValor(valor);
+        Optional<Conta> contaOptional = buscarConta(id);
+        if (contaOptional.isPresent()) {
+            Conta conta = contaOptional.get();
+            conta.setSaldo(conta.getSaldo() + valor);
+            contaDao.save(conta);
         }
     }
 
-    private void verificarContaExiste(Conta conta) {             //metodo para verificar se a conta ja existe
-        Optional<Long> idConta = contaDao.buscarIdConta(conta.getAgencia(), conta.getNumero());    //verifica se a conta ja existe
-        if (idConta.isPresent()) {                              //se a conta ja existir
-            throw new RuntimeException("Conta já cadastrada"); //exibe uma mensagem de erro
+    public void sacar(Long id, double valor) {
+        varificarValor(valor);
+        Optional<Conta> contaOptional = buscarConta(id);
+        if (contaOptional.isPresent()) {
+            Conta conta = contaOptional.get();
+            verificarSaldo(conta.getSaldo(), valor);
+            conta.setSaldo(conta.getSaldo() - valor);
+            contaDao.save(conta);
         }
     }
 
-    private Optional<Conta> buscarConta(Long id) {              //metodo para buscar uma conta
-        return contaDao.findById(id);                           //busca a conta pelo id
+    private Transferencia registrarTransferencia(long idContaOrigem, long idContaDestino, double valor) {
+        Transferencia transferencia = new Transferencia();
+        transferencia.setIdContaOrigem(idContaOrigem);
+        transferencia.setIdContaDestino(idContaDestino);
+        transferencia.setValor(valor);
+        transferencia.setDataTransferencia(LocalDateTime.now());
+        transferenciaDao.save(transferencia);
+        return transferencia;
     }
 
-    private void valorMaiorQueZero(double valor) {               //metodo para verificar se o valor nao e menor que zero
-        if (valor < 0) {
-            throw new RuntimeException("O valor deve ser maior que zero");
+    private Optional<Conta> buscarConta(Long id) {
+
+        return contaDao.findById(id);
+
+    }
+    private Long buscarIdConta(String chavePix) {
+        Optional<Conta> conta = contaDao.findByChavePix(chavePix);
+        if(conta.isPresent()){
+            return conta.get().getId();
+        }
+        throw new RuntimeException("Conta não encontrada");
+    }
+    private Long buscarIdConta(Long agencia, Long numero) {
+        Optional<Conta> conta = contaDao.findByAgenciaAndNumero(agencia, numero);
+        if(conta.isPresent()){
+            return conta.get().getId();
+        }
+        throw new RuntimeException("Conta não encontrada");
+    }
+    private void verificarContaExiste(Conta conta) {
+
+        Optional<Conta> contaOptional = contaDao.findByAgenciaAndNumero(conta.getAgencia(), conta.getNumero());
+
+        if (contaOptional.isPresent()) {
+            throw new RuntimeException("Conta já cadastrada");
+        }
+
+    }
+    private void varificarValor(double valor){
+        if(valor < 0){
+            throw new RuntimeException("Valor não pode ser negativo");
         }
     }
 
-    private void valorSuficiente(Conta conta, double valor) {     //metodo para verificar se tem saldo suficiente
-        if (conta.getSaldo() < valor) {
+    private void verificarSaldo(double saldo, double valor){
+        if(saldo< 0){
             throw new RuntimeException("Saldo insuficiente");
         }
     }
 
-    private Long buscaridConta(String chavePix) {                //metodo para buscar o id da conta
-        Optional<Long> idConta = contaDao.buscarIdConta(chavePix);  //busca o id da conta pelo chave pix
-        if (idConta.isPresent()) {                                  //se o id da conta existir
-            return idConta.get();
-        }
-        throw new RuntimeException("id da conta não encontrada");
-    }
-
-    private Long buscaridConta(Long agencia, Long numero) {      //metodo para buscar o id da conta por agencia e numero
-        Optional<Long> idConta = contaDao.buscarIdConta(agencia, numero);    //busca o id da conta pelo agencia e numero
-        if (idConta.isPresent()) {                                  //se o id da conta existir
-            return idConta.get();
-        }
-        throw new RuntimeException("id da conta não encontrada");
-    }
 }
-
