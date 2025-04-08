@@ -6,12 +6,15 @@ import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.Endereco;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
 import java.util.InputMismatchException;
+import java.util.Optional;
 
 @Service
 public class ClienteService {
@@ -27,6 +30,7 @@ public class ClienteService {
     }
 
     private void verificarDadosCliente(Cliente cliente) {
+        /*Verifica os dados do cliente estao compativel*/
         verificarClienteExiste(cliente);
         validarNome(cliente.getNome());
         validarCpf(cliente.getCpf());
@@ -41,6 +45,7 @@ public class ClienteService {
     }
 
     private void validarEndereco(Endereco endereco) {
+        /*Verifica o endereco do cliente*/
         String regexCep = "^\\d{5}-\\d{3}$";
 
         if ((endereco.getCidade() == null || endereco.getCidade().isEmpty()) ||
@@ -54,6 +59,7 @@ public class ClienteService {
     }
 
     private void validarDataDeNascimento(String data) {
+        /*Valida se o cliente e maior de idade*/
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
         Date dataNascimentoDate = null;
@@ -75,7 +81,7 @@ public class ClienteService {
     }
 
     private void validarCpf(String CPF) {
-        // considera-se erro CPF"s formados por uma sequencia de numeros iguais
+        /*Validador de cpf com regex para formatar o cpf*/
         String regex = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}";
 
         if (!CPF.matches(regex)) {
@@ -95,7 +101,7 @@ public class ClienteService {
         char dig10, dig11;
         int sm, i, r, num, peso;
 
-        // "try" - protege o codigo para eventuais erros de conversao de tipo (int)
+
         try {
             // Calculo do 1o. Digito Verificador
             sm = 0;
@@ -143,6 +149,7 @@ public class ClienteService {
     }
 
     private void validarNome(String nome) {
+        /*Valida se o nome tem apenas letras*/
         String regex = "^[A-Za-zÀ-ÖØ-öø-ÿ ]+$";
 
         if (!nome.matches(regex)) {
@@ -152,4 +159,45 @@ public class ClienteService {
         }
     }
 
+    public Cliente buscarId(Long id) {
+        Optional<Cliente> cliente = clienteDao.findById(id);
+        if (cliente.isPresent()) {
+            return cliente.get();
+        }
+        throw new RuntimeException("Cliente não encontrado");
+    }
+
+    public void atualizar(Long id, Cliente cliente) {
+        /*Atualiza os dados do cliente*/
+        Cliente clienteAtualizar = buscarId(id);
+        try {
+            validarNome(cliente.getNome());
+            validarCpf(cliente.getCpf());
+            validarDataDeNascimento(cliente.getDataNascimento());
+            validarEndereco(cliente.getEndereco());
+            clienteAtualizar.setNome(cliente.getNome());
+            clienteAtualizar.setCpf(cliente.getCpf());
+            clienteAtualizar.setDataNascimento(cliente.getDataNascimento());
+            clienteAtualizar.setEndereco(cliente.getEndereco());
+            clienteDao.save(clienteAtualizar);
+        } catch (Exception e) {
+            throw new RuntimeException("Cliente nao atualizado " + e.getMessage());     //fazer classe de erros com msgs
+        }
+
+
+    }
+
+    public void apagar(Long id) {
+        /*Verifica se o cliente existe para entao deletar*/
+        Optional<Cliente> optional = clienteDao.findById(id);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("Cliente não encontrado");
+        }
+
+        clienteDao.delete(optional.get());
+    }
+
+    public Object buscarTodos() {
+        return clienteDao.findAll();
+    }
 }

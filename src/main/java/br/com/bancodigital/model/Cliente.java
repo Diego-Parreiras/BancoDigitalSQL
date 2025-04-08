@@ -2,6 +2,7 @@ package br.com.bancodigital.model;
 
 import br.com.bancodigital.model.enuns.TipoCliente;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String nome;
     private String cpf;
 
@@ -29,6 +30,7 @@ public class Cliente {
     private TipoCliente tipo;
 
     @OneToMany(mappedBy = "cliente")
+    @JsonManagedReference
     private List<Conta> contas;
 
 

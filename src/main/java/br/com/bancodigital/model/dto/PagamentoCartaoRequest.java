@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class TransferenciaTedRequest {
-    private Long idOrigem;
-    private Long agenciaDestino;
-    private Long numeroContaDestino;
-    private double valor;
+public class PagamentoCartaoRequest {
+    private double pagamento;
     private Long senha;
-
 }

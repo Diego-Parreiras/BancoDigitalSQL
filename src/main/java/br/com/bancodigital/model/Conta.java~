@@ -15,13 +15,13 @@ import java.util.List;
 @Data
 @Entity
 public class Conta {
-    private Long numero;
-    private Long agencia;
-    private Long senha;
+    private long numero;
+    private long agencia;
+    private long senha;
     private double saldo;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     @ManyToOne
     @JoinColumn(name = "id_cliente")
     @JsonBackReference

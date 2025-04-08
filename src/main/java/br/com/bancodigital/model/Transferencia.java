@@ -19,9 +19,9 @@ import java.time.LocalDateTime;
 public class Transferencia
 {   @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private long idContaOrigem;
-    private long idContaDestino;
+    private Long id;
+    private Long idContaOrigem;
+    private Long idContaDestino;
     private double valor;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime dataTransferencia;

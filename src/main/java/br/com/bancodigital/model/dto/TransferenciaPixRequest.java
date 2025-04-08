@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class TransferenciaPixRequest {
     private String chavePix;
-    private long idContaOrigem;
+    private Long idContaOrigem;
     private double valor;
-    private long senha;
+    private Long senha;
 }
