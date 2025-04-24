@@ -124,6 +124,9 @@ public class CartaoService {
 
     private void verificarValor(Cartao cartao, PagamentoCartaoRequest pagamento) {
         /*Verifica se o valor e valido para pagamemto */
+        if (!pagamento.getSenha().equals(cartao.getSenha())) {
+            throw new RuntimeException("Senha incorreta");
+        }
         if (pagamento.getPagamento() < 0) {
             throw new RuntimeException("Valor nao pode ser negativo");
         }
@@ -131,9 +134,8 @@ public class CartaoService {
             if (pagamento.getPagamento() > ((CartaoDeCredito) cartao).getLimiteCredito()) {
                 throw new RuntimeException("Limite insuficiente");
             }
-
             ((CartaoDeCredito) cartao).setFatura(((CartaoDeCredito) cartao).getFatura() + pagamento.getPagamento());
-            System.out.println("Fatura: " + ((CartaoDeCredito) cartao).getFatura());
+            cartaoDao.save(cartao);
         } else if (cartao instanceof CartaoDeDebito) {
             if (pagamento.getPagamento() > ((CartaoDeDebito) cartao).getLimiteDiario()) {
                 throw new RuntimeException("Limite insuficiente");
@@ -141,16 +143,14 @@ public class CartaoService {
             if (cartao.getConta().getSaldo() < pagamento.getPagamento()) {
                 throw new RuntimeException("Saldo insuficiente");
             }
+
             ((CartaoDeDebito) cartao).setLimiteDiario(((CartaoDeDebito) cartao).getLimiteDiario() - pagamento.getPagamento());
             cartao.getConta().setSaldo(cartao.getConta().getSaldo() - pagamento.getPagamento());
-            System.out.println("Fatura: " + ((CartaoDeCredito) cartao).getFatura());
 
             contadao.save(cartao.getConta());
             cartaoDao.save(cartao);
         }
-        if (!pagamento.getSenha().equals(cartao.getSenha())) {
-            throw new RuntimeException("Senha incorreta");
-        }
+
     }
 
     public void atualizarSenha(Long id, long senha) {
