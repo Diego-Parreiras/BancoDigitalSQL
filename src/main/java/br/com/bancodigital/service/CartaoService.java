@@ -182,10 +182,11 @@ public class CartaoService {
             if (((CartaoDeCredito) cartao).getFatura() > cartao.getConta().getSaldo()) {
                 throw new RuntimeException("Saldo insuficiente");
             } else {
-                ((CartaoDeCredito) cartao).setFatura(0);
                 cartao.getConta().setSaldo(cartao.getConta().getSaldo() - ((CartaoDeCredito) cartao).getFatura());
+                ((CartaoDeCredito) cartao).setFatura(0);
                 cartaoDao.save(cartao);
                 contadao.save(cartao.getConta());
+
             }
         }
     }
