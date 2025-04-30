@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity
 public class Transferencia
 {   @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)

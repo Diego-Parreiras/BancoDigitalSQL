@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Data
 @DiscriminatorValue("DEBITO")
 public class CartaoDeDebito extends Cartao{

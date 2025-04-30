@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity
 public class Cliente {
 
     @Id
@@ -28,7 +27,6 @@ public class Cliente {
     private Endereco endereco;
     private String dataNascimento;
     private TipoCliente tipo;
-
     @OneToMany(mappedBy = "cliente")
     @JsonManagedReference
     private List<Conta> contas;

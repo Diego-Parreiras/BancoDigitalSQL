@@ -11,7 +11,6 @@ import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_cartao", discriminatorType = DiscriminatorType.STRING)

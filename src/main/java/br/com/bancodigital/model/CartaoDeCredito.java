@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity
 @DiscriminatorValue("CREDITO")
 public class CartaoDeCredito extends Cartao{
     private double limiteCredito;
