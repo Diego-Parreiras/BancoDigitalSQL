@@ -18,7 +18,6 @@ public class SqlUtils {
 
     /*================ContaDAO=================*/
     public static final String SQL_CONTA_INSERT = "INSERT INTO conta (numero, agencia, senha, saldo, id_cliente, chave_pix, tipo_conta) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    public static final String SQL_CONTA_UPDATE = "UPDATE conta SET numero = ?, agencia = ?, senha = ?, saldo = ?, id_cliente = ?, chave_pix = ?, tipo_conta = ? WHERE id = ?";
     public static final String SQL_CONTA_DELETE = "DELETE FROM conta WHERE id = ?";
     public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta WHERE id = ?";
     public static final String SQL_CONTA_FIND_BY_PIX = "SELECT * FROM conta WHERE chave_pix = ?";
@@ -26,5 +25,7 @@ public class SqlUtils {
 
     /*================TransferenciaDAO=================*/
 
+    /*================EnderecoDAO======================*/
+    public static final String SQL_ENDERECO_INSERT = "INSERT INTO endereco (rua, numero, cep, complemento, cidade, estado, id_conta) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 }
