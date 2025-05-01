@@ -8,7 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ContaDao extends JpaRepository<Conta, Long> {
+public interface ContaDao {
+    void save(Conta conta);
+
+    void deleteById(Long id);
+
+    Optional<Conta> findById(Long id);
 
     Optional<Conta> findByChavePix(String chavePix);
 

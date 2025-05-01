@@ -17,7 +17,14 @@ public class SqlUtils {
     public static final String SQL_CARTAO_SAVE = "INSERT INTO cartao (numero, ativo_ou_nao, senha, cvv, id_conta, tipo_cartao) VALUES (?, ?, ?, ?, ?, ?)";
 
     /*================ContaDAO=================*/
+    public static final String SQL_CONTA_INSERT = "INSERT INTO conta (numero, agencia, senha, saldo, id_cliente, chave_pix, tipo_conta) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public static final String SQL_CONTA_UPDATE = "UPDATE conta SET numero = ?, agencia = ?, senha = ?, saldo = ?, id_cliente = ?, chave_pix = ?, tipo_conta = ? WHERE id = ?";
+    public static final String SQL_CONTA_DELETE = "DELETE FROM conta WHERE id = ?";
+    public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta WHERE id = ?";
+    public static final String SQL_CONTA_FIND_BY_PIX = "SELECT * FROM conta WHERE chave_pix = ?";
+    public static final String SQL_CONTA_FIND_BY_AGENCIA_NUMERO = "SELECT * FROM conta WHERE agencia = ? AND numero = ?";
 
+    /*================TransferenciaDAO=================*/
 
 
 }
