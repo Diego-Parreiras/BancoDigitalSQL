@@ -1,0 +1,22 @@
+package br.com.bancodigital.dao.daoextends;
+
+import br.com.bancodigital.dao.interfaces.TransferenciaDao;
+import br.com.bancodigital.model.Transferencia;
+import br.com.bancodigital.model.rowmapper.TransferenciaRowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+public class TransferenciaDaoExtends implements TransferenciaDao {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private TransferenciaRowMapper transferenciaRowMapper;
+    @Override
+    public Transferencia save(Transferencia transferencia) {
+        SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+        String sql = "INSERT INTO transferencia (id_conta_origem, id_conta_destino, valor, data_transferencia) VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, transferencia.getIdContaOrigem(), transferencia.getIdContaDestino(), transferencia.getValor(), transferencia.getDataTransferencia());
+        return transferencia;
+    }
+}

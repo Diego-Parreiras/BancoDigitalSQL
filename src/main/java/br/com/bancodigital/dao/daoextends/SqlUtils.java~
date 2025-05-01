@@ -2,9 +2,7 @@ package br.com.bancodigital.dao.daoextends;
 
 public class SqlUtils {
 
-    public SqlUtils() {
-    }
-
+    public SqlUtils() {}
     /*================ClienteDAO=================*/
     public static final String SQL_CLIENTE_EXISTS_BY_CPF = "SELECT COUNT(*) FROM cliente WHERE cpf = ?";
     public static final String SQL_CLIENTE_SAVE = "INSERT INTO cliente (nome, cpf, data_nascimento) VALUES (?, ?, ?)";
@@ -26,7 +24,6 @@ public class SqlUtils {
     public static final String SQL_CONTA_FIND_BY_AGENCIA_NUMERO = "SELECT * FROM conta WHERE agencia = ? AND numero = ?";
 
     /*================TransferenciaDAO=================*/
-    public static final String SQL_TRANSFERENCIA_SAVE = "INSERT INTO transferencia (id_conta_origem, id_conta_destino, valor) VALUES (?, ?, ?)";
 
     /*================EnderecoDAO======================*/
     public static final String SQL_ENDERECO_INSERT = "INSERT INTO endereco (rua, numero, cep, complemento, cidade, estado, id_conta) VALUES (?, ?, ?, ?, ?, ?, ?)";
