@@ -1,4 +1,4 @@
-package br.com.bancodigital.dao;
+package br.com.bancodigital.dao.interfaces;
 
 import br.com.bancodigital.model.Conta;
 

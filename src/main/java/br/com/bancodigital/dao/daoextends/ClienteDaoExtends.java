@@ -1,0 +1,51 @@
+package br.com.bancodigital.dao.daoextends;
+
+import br.com.bancodigital.dao.interfaces.ClienteDao;
+import br.com.bancodigital.model.Cliente;
+import br.com.bancodigital.model.rowmapper.ClienteRowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+
+import java.util.List;
+import java.util.Optional;
+
+public class ClienteDaoExtends implements ClienteDao {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ClienteRowMapper clienteRowMapper;
+
+    @Override
+    public boolean existsByCpf(String cpf) {
+        Integer count = jdbcTemplate.queryForObject(SqlUtils.SQL_CLIENTE_EXISTS_BY_CPF, Integer.class, cpf);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public void save(Cliente cliente) {
+        SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
+                .addValue("nome", cliente.getNome())
+                .addValue("cpf", cliente.getCpf())
+                .addValue("data_nascimento", cliente.getDataNascimento())
+                .addValue("id", cliente.getId());
+        jdbcTemplate.update(SqlUtils.SQL_CLIENTE_SAVE, sqlParameterSource);
+    }
+
+    @Override
+    public Optional<Cliente> findById(Long id) {
+            Cliente cliente = jdbcTemplate.queryForObject(SqlUtils.SQL_CLIENTE_FIND_BY_ID, clienteRowMapper, id);
+            return Optional.of(cliente);
+    }
+
+    @Override
+    public List<Cliente> findAll() {
+        return jdbcTemplate.query(SqlUtils.SQL_CLIENTE_FIND_ALL, clienteRowMapper);
+    }
+
+    @Override
+    public void delete(Long id) {
+        jdbcTemplate.update(SqlUtils.SQL_CLIENTE_DELETE, id);
+    }
+}

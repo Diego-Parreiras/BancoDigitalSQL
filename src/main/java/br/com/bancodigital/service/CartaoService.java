@@ -1,7 +1,7 @@
 package br.com.bancodigital.service;
 
-import br.com.bancodigital.dao.CartaoDao;
-import br.com.bancodigital.dao.ContaDao;
+import br.com.bancodigital.dao.interfaces.CartaoDao;
+import br.com.bancodigital.dao.interfaces.ContaDao;
 import br.com.bancodigital.model.Cartao;
 import br.com.bancodigital.model.CartaoDeCredito;
 import br.com.bancodigital.model.CartaoDeDebito;

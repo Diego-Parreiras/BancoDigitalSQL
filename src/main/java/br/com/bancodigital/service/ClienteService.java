@@ -1,13 +1,11 @@
 package br.com.bancodigital.service;
 
-import br.com.bancodigital.dao.ClienteDao;
-import br.com.bancodigital.dao.EnderecoDao;
+import br.com.bancodigital.dao.interfaces.ClienteDao;
+import br.com.bancodigital.dao.interfaces.EnderecoDao;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.Endereco;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -194,7 +192,7 @@ public class ClienteService {
             throw new RuntimeException("Cliente não encontrado");
         }
 
-        clienteDao.delete(optional.get());
+        clienteDao.delete(optional.get().getId());
     }
 
     public Object buscarTodos() {
