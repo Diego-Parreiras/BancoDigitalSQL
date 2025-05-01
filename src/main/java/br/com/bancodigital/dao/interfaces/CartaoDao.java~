@@ -12,5 +12,4 @@ public interface CartaoDao{
     boolean existsByNumero(Long numero);
     Optional<Cartao> findByNumero(Long numero);
     void save(Cartao cartao);
-    Optional<Cartao> findById(Long id);
 }

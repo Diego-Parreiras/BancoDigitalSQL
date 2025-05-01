@@ -10,6 +10,14 @@ public class SqlUtils {
     public static final String SQL_CLIENTE_FIND_ALL = "SELECT * FROM cliente";
     public static final String SQL_CLIENTE_DELETE = "DELETE FROM cliente WHERE id = ?";
 
-    /*================EnderecoDAO=================*/
+    /*================CartaoDAO=================*/
+    public static final String SQL_CARTAO_EXISTS_BY_NUMERO = "SELECT COUNT(*) FROM cartao WHERE numero = ?";
+    public static final String SQL_CARTAO_FIND_BY_NUMERO = "SELECT * FROM cartao WHERE numero = ?";
+    public static final String SQL_CARTAO_FIND_BY_ID = "SELECT * FROM cartao WHERE id = ?";
+    public static final String SQL_CARTAO_SAVE = "INSERT INTO cartao (numero, ativo_ou_nao, senha, cvv, id_conta, tipo_cartao) VALUES (?, ?, ?, ?, ?, ?)";
+
+    /*================ContaDAO=================*/
+
+
 
 }
