@@ -1,5 +1,7 @@
 package br.com.bancodigital.service;
 
+import br.com.bancodigital.dao.daoextends.ClienteDaoExtends;
+import br.com.bancodigital.dao.daoextends.EnderecoDaoExtends;
 import br.com.bancodigital.dao.interfaces.ClienteDao;
 import br.com.bancodigital.dao.interfaces.EnderecoDao;
 import br.com.bancodigital.model.Cliente;
@@ -18,9 +20,9 @@ import java.util.Optional;
 public class ClienteService {
 
     @Autowired
-    private ClienteDao clienteDao;
+    private ClienteDaoExtends clienteDao;
     @Autowired
-    private EnderecoDao enderecoDao;
+    private EnderecoDaoExtends enderecoDao;
 
     public void cadastrar(Cliente cliente) {
         verificarDadosCliente(cliente);

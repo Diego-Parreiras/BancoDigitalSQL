@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+
 public interface ClienteDao {
     boolean existsByCpf(String cpf);
 
-    void  save(Cliente cliente);
+    void save(Cliente cliente);
 
     Optional<Cliente> findById(Long id);
 

@@ -1,5 +1,7 @@
 package br.com.bancodigital.service;
 
+import br.com.bancodigital.dao.daoextends.ContaDaoExtends;
+import br.com.bancodigital.dao.daoextends.TransferenciaDaoExtends;
 import br.com.bancodigital.dao.interfaces.ContaDao;
 import br.com.bancodigital.dao.interfaces.TransferenciaDao;
 import br.com.bancodigital.model.Conta;
@@ -20,10 +22,10 @@ import java.util.Random;
 public class ContaService {
 
     @Autowired
-    private ContaDao contaDao;
+    private ContaDaoExtends contaDao;
 
     @Autowired
-    private TransferenciaDao transferenciaDao;
+    private TransferenciaDaoExtends transferenciaDao;
 
     private final Random random = new Random();
 

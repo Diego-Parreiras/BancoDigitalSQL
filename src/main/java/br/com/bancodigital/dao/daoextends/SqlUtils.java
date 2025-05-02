@@ -2,9 +2,7 @@ package br.com.bancodigital.dao.daoextends;
 
 public class SqlUtils {
 
-    public SqlUtils() {
-    }
-
+    private SqlUtils() {}
     /*================ClienteDAO=================*/
     public static final String SQL_CLIENTE_EXISTS_BY_CPF = "SELECT COUNT(*) FROM cliente WHERE cpf = ?";
     public static final String SQL_CLIENTE_SAVE = "INSERT INTO cliente (nome, cpf, data_nascimento) VALUES (?, ?, ?)";

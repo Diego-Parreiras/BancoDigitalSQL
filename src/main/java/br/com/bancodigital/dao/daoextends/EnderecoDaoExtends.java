@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class EnderecoDaoExtends implements EnderecoDao {
     @Autowired
     private EnderecoRowMapper enderecoRowMapper;
@@ -16,6 +18,7 @@ public class EnderecoDaoExtends implements EnderecoDao {
 
     @Override
     public void save(Endereco endereco) {
+        try{
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("rua", endereco.getRua())
                 .addValue("numero", endereco.getNumero())
@@ -25,5 +28,8 @@ public class EnderecoDaoExtends implements EnderecoDao {
                 .addValue("estado", endereco.getEstado());
         jdbcTemplate.update(SqlUtils.SQL_ENDERECO_INSERT, sqlParameterSource);
 
+    }catch (Exception e){
+            throw new RuntimeException("Endereco nao cadastrado " + e.getMessage());     //fazer classe de erros com msgs
+        }
     }
 }

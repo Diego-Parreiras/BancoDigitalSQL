@@ -1,5 +1,7 @@
 package br.com.bancodigital.service;
 
+import br.com.bancodigital.dao.daoextends.CartaoDaoExtends;
+import br.com.bancodigital.dao.daoextends.ContaDaoExtends;
 import br.com.bancodigital.dao.interfaces.CartaoDao;
 import br.com.bancodigital.dao.interfaces.ContaDao;
 import br.com.bancodigital.model.Cartao;
@@ -16,9 +18,9 @@ import java.util.Random;
 @Service
 public class CartaoService {
     @Autowired
-    private CartaoDao cartaoDao;
+    CartaoDaoExtends cartaoDao;
     @Autowired
-    ContaDao contadao;
+    ContaDaoExtends contadao;
     private final Random random = new Random();
 
     public void novoCartao(Cartao cartao) {
