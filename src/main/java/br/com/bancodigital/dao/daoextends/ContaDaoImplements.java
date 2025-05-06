@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 @Repository
-public class ContaDaoExtends implements ContaDao {
+public class ContaDaoImplements implements ContaDao {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

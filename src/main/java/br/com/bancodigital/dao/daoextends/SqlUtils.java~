@@ -27,7 +27,6 @@ public class SqlUtils {
     public static final String SQL_TRANSFERENCIA_SAVE = "INSERT INTO transferencia (idContaOrigem, idContaDestino, valor) VALUES (?, ?, ?)";
 
     /*================EnderecoDAO======================*/
-    public static final String SQL_ENDERECO_INSERT =  "INSERT INTO endereco (rua, numero, complemento, cep, cidade, estado) " +
-            "VALUES (:rua, :numero, :complemento, :cep, :cidade, :estado)";
+    public static final String SQL_ENDERECO_INSERT = "INSERT INTO endereco (rua, numero, complemento, cep, cidade, estado) VALUES (?, ?, ?, ?, ?, ?)";
 
 }

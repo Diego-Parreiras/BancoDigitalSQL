@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class EnderecoDaoExtends implements EnderecoDao {
+public class EnderecoDaoImplements implements EnderecoDao {
     @Autowired
     private EnderecoRowMapper enderecoRowMapper;
     @Autowired
@@ -22,8 +22,8 @@ public class EnderecoDaoExtends implements EnderecoDao {
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("rua", endereco.getRua())
                 .addValue("numero", endereco.getNumero())
-                .addValue("cep", endereco.getCep())
                 .addValue("complemento", endereco.getComplemento())
+                .addValue("cep", endereco.getCep())
                 .addValue("cidade", endereco.getCidade())
                 .addValue("estado", endereco.getEstado());
         jdbcTemplate.update(SqlUtils.SQL_ENDERECO_INSERT, sqlParameterSource);

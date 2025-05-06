@@ -3,6 +3,7 @@ package br.com.bancodigital.dao.daoextends;
 import br.com.bancodigital.dao.interfaces.ClienteDao;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.rowmapper.ClienteRowMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Repository
-public class ClienteDaoExtends implements ClienteDao {
+public class ClienteDaoImplements implements ClienteDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -31,8 +33,11 @@ public class ClienteDaoExtends implements ClienteDao {
             SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                     .addValue("nome", cliente.getNome())
                     .addValue("cpf", cliente.getCpf())
-                    .addValue("data_nascimento", cliente.getDataNascimento())
-                    .addValue("id", cliente.getId());
+                    .addValue("dataNascimento", cliente.getDataNascimento())
+                    .addValue("idEndereco", cliente.getEndereco().getId())
+                    .addValue("id", cliente.getId())
+                    .addValue("tipoCliente",cliente.getTipo());
+
             jdbcTemplate.update(SqlUtils.SQL_CLIENTE_SAVE, sqlParameterSource);
         } catch (Exception e) {
             throw new RuntimeException("Cliente nao cadastrado " + e.getMessage());     //fazer classe de erros com msgs

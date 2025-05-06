@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class CartaoDaoExtends implements CartaoDao {
+public class CartaoDaoImplements implements CartaoDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 

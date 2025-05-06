@@ -1,12 +1,12 @@
 package br.com.bancodigital.service;
 
-import br.com.bancodigital.dao.daoextends.ClienteDaoExtends;
-import br.com.bancodigital.dao.daoextends.EnderecoDaoExtends;
-import br.com.bancodigital.dao.interfaces.ClienteDao;
-import br.com.bancodigital.dao.interfaces.EnderecoDao;
+import br.com.bancodigital.dao.daoextends.ClienteDaoImplements;
+import br.com.bancodigital.dao.daoextends.EnderecoDaoImplements;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.Endereco;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,17 +20,80 @@ import java.util.Optional;
 public class ClienteService {
 
     @Autowired
-    private ClienteDaoExtends clienteDao;
+    private ClienteDaoImplements clienteDao;
     @Autowired
-    private EnderecoDaoExtends enderecoDao;
+    private EnderecoDaoImplements enderecoDao;
+
+    private static final Logger logger = LoggerFactory.getLogger(ClienteService.class);
+
 
     public void cadastrar(Cliente cliente) {
+        logger.info("Iniciando cadastro de cliente");
         verificarDadosCliente(cliente);
         clienteDao.save(cliente);
+        logger.info("Cliente cadastrado com sucesso");
+    }
+
+   /* public static String imprimeCPF(String CPF) {
+        return (CPF.substring(0, 3) + "." + CPF.substring(3, 6) + "." +
+                CPF.substring(6, 9) + "-" + CPF.substring(9, 11));
+    }*/
+
+    public Cliente buscarId(Long id) {
+        logger.info("Buscando cliente");
+        Optional<Cliente> cliente = clienteDao.findById(id);
+        if (cliente.isPresent()) {
+            logger.info("Cliente encontrado");
+            return cliente.get();
+
+        }
+        logger.info("Cliente nao encontrado");
+        throw new RuntimeException("Cliente não encontrado");
+    }
+
+    public void atualizar(Long id, Cliente cliente) {
+        /*Atualiza os dados do cliente*/
+        logger.info("Atualizando cliente");
+        Cliente clienteAtualizar = buscarId(id);
+        try {
+            validarNome(cliente.getNome());
+            validarCpf(cliente.getCpf());
+            validarDataDeNascimento(cliente.getDataNascimento());
+            validarEndereco(cliente.getEndereco());
+            clienteAtualizar.setNome(cliente.getNome());
+            clienteAtualizar.setCpf(cliente.getCpf());
+            clienteAtualizar.setDataNascimento(cliente.getDataNascimento());
+            clienteAtualizar.setEndereco(cliente.getEndereco());
+            clienteDao.save(clienteAtualizar);
+            logger.info("Cliente atualizado com sucesso");
+        } catch (Exception e) {
+            logger.info("Cliente nao atualizado " + e.getMessage());
+            throw new RuntimeException("Cliente nao atualizado " + e.getMessage());
+        }
+
+
+    }
+
+    public void apagar(Long id) {
+        /*Verifica se o cliente existe para entao deletar*/
+        logger.info("Deletando cliente");
+        Optional<Cliente> optional = clienteDao.findById(id);
+        if (!optional.isPresent()) {
+            logger.info("Cliente nao encontrado");
+            throw new RuntimeException("Cliente não encontrado");
+        }
+        logger.info("Cliente deletado com sucesso");
+        clienteDao.delete(optional.get().getId());
+    }
+
+    public Object buscarTodos() {
+        logger.info("Buscando todos os clientes");
+        return clienteDao.findAll();
     }
 
     private void verificarDadosCliente(Cliente cliente) {
         /*Verifica os dados do cliente estao compativel*/
+        logger.info("Verificando dados do cliente");
         verificarClienteExiste(cliente);
         validarNome(cliente.getNome());
         validarCpf(cliente.getCpf());
@@ -40,32 +103,37 @@ public class ClienteService {
 
     private void verificarClienteExiste(Cliente cliente) {
         if (clienteDao.existsByCpf(cliente.getCpf())) {
+            logger.info("CPF já cadastrado");
             throw new RuntimeException("CPF já cadastrado");
         }
     }
 
     private void validarEndereco(Endereco endereco) {
         /*Verifica o endereco do cliente*/
+        logger.info("Validando endereço");
         String regexCep = "^\\d{5}-\\d{3}$";
 
         if ((endereco.getCidade() == null || endereco.getCidade().isEmpty()) ||
                 (endereco.getEstado() == null || endereco.getEstado().isEmpty()) ||
                 (endereco.getRua() == null || endereco.getRua().isEmpty()) ||
                 (endereco.getNumero() == null || endereco.getNumero().isEmpty())) {
-
+            logger.info("Endereço inválido");
             throw new RuntimeException("Endereço inválido");
         }
         enderecoDao.save(endereco);
+        logger.info("Endereço válido");
     }
 
     private void validarDataDeNascimento(String data) {
         /*Valida se o cliente e maior de idade*/
+        logger.info("Validando data de nascimento");
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
         Date dataNascimentoDate = null;
         try {
             dataNascimentoDate = sdf.parse(data);
         } catch (Exception e) {
+            logger.info("Formato de data inválido");
             throw new RuntimeException("Formato de data inválido");
         }
         Date dataAtual = new Date();
@@ -76,12 +144,14 @@ public class ClienteService {
         }
 
         if (idade < 18) {
+            logger.info("O cliente deve ter mais de 18 anos");
             throw new RuntimeException("O cliente deve ter mais de 18 anos");
         }
     }
 
     private void validarCpf(String CPF) {
         /*Validador de cpf com regex para formatar o cpf*/
+        logger.info("Validando CPF");
         String regex = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}";
 
         if (!CPF.matches(regex)) {
@@ -136,16 +206,13 @@ public class ClienteService {
 
             // Verifica se os digitos calculados conferem com os digitos informados.
             if ((dig10 != CPF.charAt(9)) && (dig11 != CPF.charAt(10)))
-                throw new RuntimeException("CPF inválido");
+                logger.info("CPF inválido");
+            throw new RuntimeException("CPF inválido");
 
         } catch (InputMismatchException erro) {
+            logger.info("CPF inválido");
             throw new RuntimeException("CPF inválido");
         }
-    }
-
-    public static String imprimeCPF(String CPF) {
-        return (CPF.substring(0, 3) + "." + CPF.substring(3, 6) + "." +
-                CPF.substring(6, 9) + "-" + CPF.substring(9, 11));
     }
 
     private void validarNome(String nome) {
@@ -153,51 +220,12 @@ public class ClienteService {
         String regex = "^[A-Za-zÀ-ÖØ-öø-ÿ ]+$";
 
         if (!nome.matches(regex)) {
+            logger.info("O nome deve conter apenas letras.");
             throw new RuntimeException("O nome deve conter apenas letras.");
         } else if (nome.length() < 2 || nome.length() > 100) {
+            logger.info("O nome deve ter entre 2 e 100 caracteres.");
             throw new RuntimeException("O nome deve ter entre 2 e 100 caracteres.");
         }
     }
 
-    public Cliente buscarId(Long id) {
-        Optional<Cliente> cliente = clienteDao.findById(id);
-        if (cliente.isPresent()) {
-            return cliente.get();
-        }
-        throw new RuntimeException("Cliente não encontrado");
-    }
-
-    public void atualizar(Long id, Cliente cliente) {
-        /*Atualiza os dados do cliente*/
-        Cliente clienteAtualizar = buscarId(id);
-        try {
-            validarNome(cliente.getNome());
-            validarCpf(cliente.getCpf());
-            validarDataDeNascimento(cliente.getDataNascimento());
-            validarEndereco(cliente.getEndereco());
-            clienteAtualizar.setNome(cliente.getNome());
-            clienteAtualizar.setCpf(cliente.getCpf());
-            clienteAtualizar.setDataNascimento(cliente.getDataNascimento());
-            clienteAtualizar.setEndereco(cliente.getEndereco());
-            clienteDao.save(clienteAtualizar);
-        } catch (Exception e) {
-            throw new RuntimeException("Cliente nao atualizado " + e.getMessage());     //fazer classe de erros com msgs
-        }
-
-
-    }
-
-    public void apagar(Long id) {
-        /*Verifica se o cliente existe para entao deletar*/
-        Optional<Cliente> optional = clienteDao.findById(id);
-        if (!optional.isPresent()) {
-            throw new RuntimeException("Cliente não encontrado");
-        }
-
-        clienteDao.delete(optional.get().getId());
-    }
-
-    public Object buscarTodos() {
-        return clienteDao.findAll();
-    }
 }
