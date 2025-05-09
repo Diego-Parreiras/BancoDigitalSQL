@@ -1,19 +1,18 @@
 package br.com.bancodigital.service;
 
-import br.com.bancodigital.dao.daoextends.ContaDaoImplements;
-import br.com.bancodigital.dao.daoextends.TransferenciaDaoImplements;
+import br.com.bancodigital.dao.daoimplements.ContaDaoImplements;
+import br.com.bancodigital.dao.daoimplements.TransferenciaDaoImplements;
 import br.com.bancodigital.model.Conta;
 import br.com.bancodigital.model.Transferencia;
 import br.com.bancodigital.model.dto.TransferenciaPixRequest;
 import br.com.bancodigital.model.dto.TransferenciaTedRequest;
 import br.com.bancodigital.model.enuns.TipoCliente;
 import br.com.bancodigital.model.enuns.TipoConta;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
@@ -28,17 +27,19 @@ public class ContaService {
 
     private final Logger logger = LoggerFactory.getLogger(ContaService.class);
     private final Random random = new Random();
-
+    @Transactional
     public void criarConta(Conta conta) {
-        /*Verifica de a conta ja existe, se nao, completa os dados da conta e salva*/
-        logger.info("Iniciando cadastro de conta");
-        verificarContaExiste(conta);
-        popularDadosConta(conta);
-        contaDao.save(conta);
-        logger.info("Conta cadastrada com sucesso");
+        try {
+            /*Verifica de a conta ja existe, se nao, completa os dados da conta e salva*/
+            logger.info("Iniciando cadastro de conta");
+            verificarContaExiste(conta);
+            popularDadosConta(conta);
+            contaDao.save(conta);
+            logger.info("Conta cadastrada com sucesso");
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
-
-
     @Transactional
     public Transferencia transferenciaPix(TransferenciaPixRequest request) {
         /*verifica se o valor existe e se a conta origem existe
@@ -98,7 +99,7 @@ public class ContaService {
         logger.info("ContaOrigem não encontrada");
         throw new RuntimeException("ContaOrigem não encontrada");
     }
-
+    @Transactional
     public void fecharConta(Long id) {
         /*procura conta e se existir verifica se o saldo e 0 para fechar a conta*/
         logger.info("Iniciando fechamento de conta");
@@ -221,7 +222,7 @@ public class ContaService {
         throw new RuntimeException("Conta não encontrada");
     }
 
-    private Long buscarIdConta(Long agencia, Long numero) {
+     private Long buscarIdConta(Long agencia, Long numero) {
         /*busca comta pela agencia e numero*/
         logger.info("Iniciando busca de conta");
         Optional<Conta> conta = contaDao.findByAgenciaAndNumero(agencia, numero);

@@ -1,14 +1,14 @@
 package br.com.bancodigital.service;
 
-import br.com.bancodigital.dao.daoextends.ClienteDaoImplements;
-import br.com.bancodigital.dao.daoextends.EnderecoDaoImplements;
+import br.com.bancodigital.dao.daoimplements.ClienteDaoImplements;
+import br.com.bancodigital.dao.interfaces.EnderecoDao;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.Endereco;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 
@@ -22,14 +22,16 @@ public class ClienteService {
     @Autowired
     private ClienteDaoImplements clienteDao;
     @Autowired
-    private EnderecoDaoImplements enderecoDao;
+    private EnderecoDao enderecoDao;
 
     private static final Logger logger = LoggerFactory.getLogger(ClienteService.class);
 
-
+    @Transactional
     public void cadastrar(Cliente cliente) {
         logger.info("Iniciando cadastro de cliente");
         verificarDadosCliente(cliente);
+        Long idEndereco = enderecoDao.save(cliente.getEndereco());
+        cliente.getEndereco().setId(idEndereco);
         clienteDao.save(cliente);
         logger.info("Cliente cadastrado com sucesso");
     }
@@ -51,6 +53,7 @@ public class ClienteService {
         throw new RuntimeException("Cliente não encontrado");
     }
 
+    @Transactional
     public void atualizar(Long id, Cliente cliente) {
         /*Atualiza os dados do cliente*/
         logger.info("Atualizando cliente");
@@ -74,6 +77,7 @@ public class ClienteService {
 
     }
 
+    @Transactional
     public void apagar(Long id) {
         /*Verifica se o cliente existe para entao deletar*/
         logger.info("Deletando cliente");
@@ -120,7 +124,6 @@ public class ClienteService {
             logger.info("Endereço inválido");
             throw new RuntimeException("Endereço inválido");
         }
-        enderecoDao.save(endereco);
         logger.info("Endereço válido");
     }
 
@@ -205,9 +208,10 @@ public class ClienteService {
             else dig11 = (char) (r + 48);
 
             // Verifica se os digitos calculados conferem com os digitos informados.
-            if ((dig10 != CPF.charAt(9)) && (dig11 != CPF.charAt(10)))
+            if ((dig10 != CPF.charAt(9)) && (dig11 != CPF.charAt(10))) {
                 logger.info("CPF inválido");
-            throw new RuntimeException("CPF inválido");
+                throw new RuntimeException("CPF inválido");
+            }
 
         } catch (InputMismatchException erro) {
             logger.info("CPF inválido");

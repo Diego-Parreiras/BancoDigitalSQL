@@ -1,6 +1,7 @@
-package br.com.bancodigital.dao.daoextends;
+package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.ContaDao;
+import br.com.bancodigital.dao.utils.SqlUtils;
 import br.com.bancodigital.model.Conta;
 import br.com.bancodigital.model.rowmapper.ContaRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+
 @Repository
 public class ContaDaoImplements implements ContaDao {
 
@@ -21,26 +23,25 @@ public class ContaDaoImplements implements ContaDao {
 
     @Override
     public void save(Conta conta) {
-        try{
-        SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
-                .addValue("numero", conta.getNumero())
-                .addValue("agencia", conta.getAgencia())
-                .addValue("senha", conta.getSenha())
-                .addValue("saldo", conta.getSaldo())
-                .addValue("id_cliente", conta.getCliente().getId())
-                .addValue("chave_pix", conta.getChavePix())
-                .addValue("tipo_conta", conta.getTipoConta().name());
-        jdbcTemplate.update(SqlUtils.SQL_CONTA_INSERT, sqlParameterSource);
-    }catch (Exception e){
-            System.out.println(e.getMessage());
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CONTA_INSERT,
+                    conta.getAgencia(),
+                    conta.getChavePix(),
+                    conta.getNumero(),
+                    conta.getSaldo(),
+                    conta.getSenha(),
+                    conta.getTipoConta().ordinal(),
+                    conta.getCliente().getId());
+        } catch (Exception e) {
+            System.out.println("Erro ao cadastrar conta" + e.getMessage());
         }
     }
 
     @Override
     public void deleteById(Long id) {
         try {
-        jdbcTemplate.update(SqlUtils.SQL_CONTA_DELETE, id);
-    }catch (Exception e){
+            jdbcTemplate.update(SqlUtils.SQL_CONTA_DELETE, id);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }

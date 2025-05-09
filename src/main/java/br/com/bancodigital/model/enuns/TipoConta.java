@@ -7,4 +7,16 @@ public enum TipoConta {
 
     TipoConta(int i) {
     }
+    public int getValor() {
+        return tipo;
+    }
+
+    public static TipoConta fromInt(int i) {
+        for(TipoConta tc : values()) {
+            if(tc.getValor() == i) {
+                return tc;
+            }
+        }
+        return null;
+    }
 }

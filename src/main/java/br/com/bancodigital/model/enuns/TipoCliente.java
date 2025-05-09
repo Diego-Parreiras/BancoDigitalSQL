@@ -8,4 +8,17 @@ public enum TipoCliente {
 
     TipoCliente(int i) {
     }
+
+    public int getValor() {
+        return tipo;
+    }
+
+    public static TipoCliente fromInt(int i) {
+        for(TipoCliente tc : values()) {
+            if(tc.getValor() == i) {
+                return tc;
+            }
+        }
+        return null;
+    }
 }

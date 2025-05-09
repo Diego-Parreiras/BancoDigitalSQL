@@ -1,12 +1,11 @@
-package br.com.bancodigital.dao.daoextends;
+package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.CartaoDao;
+import br.com.bancodigital.dao.utils.SqlUtils;
 import br.com.bancodigital.model.Cartao;
 import br.com.bancodigital.model.rowmapper.CartaoRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -45,15 +44,13 @@ public class CartaoDaoImplements implements CartaoDao {
     @Override
     public void save(Cartao cartao) {
         try {
-            SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
-                    .addValue("numero", cartao.getNumero())
-                    .addValue("ativo_ou_nao", cartao.isAtivoOuNao())
-                    .addValue("senha", cartao.getSenha())
-                    .addValue("cvv", cartao.getCvv())
-                    .addValue("id_conta", cartao.getConta().getId())
-                    .addValue("tipo_cartao", cartao.getClass().getSimpleName());
-
-            jdbcTemplate.update(SqlUtils.SQL_CARTAO_SAVE, sqlParameterSource);
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_SAVE,
+                    cartao.getNumero(),
+                    cartao.isAtivoOuNao(),
+                    cartao.getSenha(),
+                    cartao.getCvv(),
+                    cartao.getConta().getId(),
+                    cartao.getClass().getSimpleName());
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

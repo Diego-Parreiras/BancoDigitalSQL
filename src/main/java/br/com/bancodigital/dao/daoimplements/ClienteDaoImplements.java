@@ -1,13 +1,12 @@
-package br.com.bancodigital.dao.daoextends;
+package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.ClienteDao;
+import br.com.bancodigital.dao.utils.SqlUtils;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.rowmapper.ClienteRowMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,15 +29,13 @@ public class ClienteDaoImplements implements ClienteDao {
     @Override
     public void save(Cliente cliente) {
         try {
-            SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
-                    .addValue("nome", cliente.getNome())
-                    .addValue("cpf", cliente.getCpf())
-                    .addValue("dataNascimento", cliente.getDataNascimento())
-                    .addValue("idEndereco", cliente.getEndereco().getId())
-                    .addValue("id", cliente.getId())
-                    .addValue("tipoCliente",cliente.getTipo());
-
-            jdbcTemplate.update(SqlUtils.SQL_CLIENTE_SAVE, sqlParameterSource);
+            jdbcTemplate.update(SqlUtils.SQL_CLIENTE_SAVE,
+                    cliente.getNome(),
+                    cliente.getCpf(),
+                    cliente.getDataNascimento(),
+                    cliente.getEndereco().getId(),
+                    cliente.getTipo().getValor()
+                    );
         } catch (Exception e) {
             throw new RuntimeException("Cliente nao cadastrado " + e.getMessage());     //fazer classe de erros com msgs
         }

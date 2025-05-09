@@ -1,7 +1,7 @@
 package br.com.bancodigital.service;
 
-import br.com.bancodigital.dao.daoextends.CartaoDaoImplements;
-import br.com.bancodigital.dao.daoextends.ContaDaoImplements;
+import br.com.bancodigital.dao.daoimplements.CartaoDaoImplements;
+import br.com.bancodigital.dao.daoimplements.ContaDaoImplements;
 import br.com.bancodigital.model.Cartao;
 import br.com.bancodigital.model.CartaoDeCredito;
 import br.com.bancodigital.model.CartaoDeDebito;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Random;
@@ -26,6 +27,7 @@ public class CartaoService {
 
     private static final Logger logger = LoggerFactory.getLogger(CartaoService.class);
 
+    @Transactional
     public void novoCartao(Cartao cartao) {
         logger.info("Iniciando cadastro de cartao");
         validarDados(cartao);
@@ -45,9 +47,10 @@ public class CartaoService {
         return cartaoOptional.get();
     }
 
+    @Transactional
     public void pagar(long id, PagamentoCartaoRequest pagamento) {
         /*Metodo de pagamento padrao do cartao*/
-        logger.info("Iniciando pagamento com cartao de ID "+id);
+        logger.info("Iniciando pagamento com cartao de ID " + id);
         Cartao cartao = buscarId(id);
         verStatus(cartao);
         verificarValor(cartao, pagamento);
@@ -55,7 +58,7 @@ public class CartaoService {
 
     public void aumentarLimiteCredito(Long id, double valor) {
         /*Pede um novo limite do cartao de credito*/
-        logger.info("Aumentando limite do cartao de ID "+id);
+        logger.info("Aumentando limite do cartao de ID " + id);
         if (valor < 0) {
             logger.info("Valor nao pode ser negativo");
             throw new RuntimeException("Valor nao pode ser negativo");
@@ -63,7 +66,7 @@ public class CartaoService {
         Cartao cartao = buscarId(id);
         verStatus(cartao);
         if (cartao instanceof CartaoDeCredito) {
-            logger.info("Cartao de Credito selecionado de ID "+cartao.getId());
+            logger.info("Cartao de Credito selecionado de ID " + cartao.getId());
             ((CartaoDeCredito) cartao).setLimiteCredito(valor);
             logger.info("Limite aumentado com sucesso");
         }
@@ -72,7 +75,7 @@ public class CartaoService {
     }
 
     public void aumentarLimiteDebito(Long id, double valor) {
-        logger.info("Aumentando limite do cartao de ID "+id);
+        logger.info("Aumentando limite do cartao de ID " + id);
         if (valor < 0) {
             logger.info("Valor negativo");
             throw new RuntimeException("Valor nao pode ser negativo");
@@ -80,7 +83,7 @@ public class CartaoService {
         Cartao cartao = buscarId(id);
         verStatus(cartao);
         if (cartao instanceof CartaoDeDebito) {
-            logger.info("Cartao de Debito selecionado de ID "+cartao.getId());
+            logger.info("Cartao de Debito selecionado de ID " + cartao.getId());
             ((CartaoDeDebito) cartao).setLimiteDiario(valor);
             logger.info("Limite aumentado com sucesso");
         }
@@ -90,12 +93,12 @@ public class CartaoService {
 
     public void mudarStatus(Long id) {
         /*Desativa ou aticva o cartao*/
-        logger.info("Mudando status do cartao de ID "+id);
+        logger.info("Mudando status do cartao de ID " + id);
         Cartao cartao = buscarId(id);
 
         if (cartao != null) {
             if (cartao instanceof CartaoDeCredito) {
-                logger.info("Cartao de Credito selecionado de ID "+cartao.getId());
+                logger.info("Cartao de Credito selecionado de ID " + cartao.getId());
                 if (((CartaoDeCredito) cartao).getFatura() != 0) {
                     logger.info("Fatura Pendente");
                     throw new RuntimeException("Preciso pagar a fatura primeiro");
@@ -112,7 +115,7 @@ public class CartaoService {
 
     public void atualizarSenha(Long id, long senha) {
         /*Atualiza a senha do cartao*/
-        logger.info("Atualizando senha do cartao de ID "+id);
+        logger.info("Atualizando senha do cartao de ID " + id);
         Cartao cartao = buscarId(id);
         cartao.setSenha(senha);
         cartaoDao.save(cartao);
@@ -121,23 +124,23 @@ public class CartaoService {
 
     public double buscarFatura(Long id) {
         /*Encontra a fatura*/
-        logger.info("Buscando fatura do cartao de ID "+id);
+        logger.info("Buscando fatura do cartao de ID " + id);
         Cartao cartao = buscarId(id);
         if (cartao instanceof CartaoDeCredito) {
-            logger.info("Cartao de Credito selecionado de ID "+cartao.getId());
+            logger.info("Cartao de Credito selecionado de ID " + cartao.getId());
             return ((CartaoDeCredito) cartao).getFatura();
 
         }
         logger.info("Cartao de debito");
         throw new RuntimeException("Cartao de debito");
     }
-
+    @Transactional
     public void pagarFatura(Long id) {
         /*Paga a fatura*/
-        logger.info("Pagando fatura do cartao de ID "+id);
+        logger.info("Pagando fatura do cartao de ID " + id);
         Cartao cartao = buscarId(id);
         if (cartao instanceof CartaoDeCredito) {
-            logger.info("Cartao de Credito selecionado de ID "+cartao.getId());
+            logger.info("Cartao de Credito selecionado de ID " + cartao.getId());
             if (((CartaoDeCredito) cartao).getFatura() == 0) {
                 logger.info("Fatura ja paga");
                 throw new RuntimeException("Fatura ja paga");
@@ -158,6 +161,7 @@ public class CartaoService {
             }
         }
     }
+
     private void verStatus(Cartao cartao) {
         /*verifica se o cartao esta ativo*/
         logger.info("Verificando status do cartao");
@@ -180,7 +184,7 @@ public class CartaoService {
             throw new RuntimeException("Valor nao pode ser negativo");
         }
         if (cartao instanceof CartaoDeCredito) {
-            logger.info("Cartao de Credito selecionado de ID "+cartao.getId());
+            logger.info("Cartao de Credito selecionado de ID " + cartao.getId());
             if (pagamento.getPagamento() > ((CartaoDeCredito) cartao).getLimiteCredito()) {
                 logger.info("Limite insuficiente");
                 throw new RuntimeException("Limite insuficiente");
@@ -189,7 +193,7 @@ public class CartaoService {
             cartaoDao.save(cartao);
             logger.info("Pagamento realizado com sucesso");
         } else if (cartao instanceof CartaoDeDebito) {
-            logger.info("Cartao de Debito selecionado de ID "+cartao.getId());
+            logger.info("Cartao de Debito selecionado de ID " + cartao.getId());
             if (pagamento.getPagamento() > ((CartaoDeDebito) cartao).getLimiteDiario()) {
                 logger.info("Limite insuficiente");
                 throw new RuntimeException("Limite insuficiente");
@@ -232,6 +236,7 @@ public class CartaoService {
         }
         logger.info("Cartao populado com sucesso");
     }
+
     private void validarDados(Cartao cartao) {
         /*Verifica se o cartao ja esta cadastrado*/
         logger.info("Validando dados do cartao");

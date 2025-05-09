@@ -23,7 +23,9 @@ public class CartaoRowMapper implements RowMapper<Cartao> {
             credito.setFatura(rs.getDouble("fatura"));
             cartao = credito;
         } else if ("debito".equalsIgnoreCase(tipo)) {
-            cartao = new CartaoDeDebito();
+            CartaoDeDebito debito = new CartaoDeDebito();
+            debito.setLimiteDiario(rs.getDouble("limite_diario"));
+            cartao = debito;
         } else {
             throw new SQLException("Tipo de cartão desconhecido: " + tipo);
         }
