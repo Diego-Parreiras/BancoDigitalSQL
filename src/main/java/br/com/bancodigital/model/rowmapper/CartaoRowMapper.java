@@ -14,7 +14,7 @@ public class CartaoRowMapper implements RowMapper<Cartao> {
 
     @Override
     public Cartao mapRow(ResultSet rs, int rowNum) throws SQLException {
-        String tipo = rs.getString("tipo"); // precisa existir no banco
+        String tipo = rs.getString("tipo_cartao");
         Cartao cartao;
 
         if ("credito".equalsIgnoreCase(tipo)) {
@@ -31,11 +31,10 @@ public class CartaoRowMapper implements RowMapper<Cartao> {
         }
 
         cartao.setId(rs.getLong("id"));
-        cartao.setNumero(rs.getLong("numero"));
         cartao.setAtivoOuNao(rs.getBoolean("ativo_ou_nao"));
-        cartao.setSenha(rs.getLong("senha"));
         cartao.setCvv(rs.getLong("cvv"));
-
+        cartao.setNumero(rs.getLong("numero"));
+        cartao.setSenha(rs.getLong("senha"));
         return cartao;
     }
 }

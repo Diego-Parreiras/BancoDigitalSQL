@@ -2,14 +2,12 @@ package br.com.bancodigital.dao.utils;
 
 public class SqlUtils {
 
-    private SqlUtils() {
-    }
 
     /*================ClienteDAO=================*/
     public static final String SQL_CLIENTE_EXISTS_BY_CPF = "SELECT COUNT(*) FROM cliente WHERE cpf = ?";
     public static final String SQL_CLIENTE_SAVE = "INSERT INTO cliente (nome, cpf, data_nascimento,id_endereco, tipo) VALUES (?, ?, ?, ?, ?)";
     public static final String SQL_CLIENTE_FIND_BY_ID = "SELECT * FROM cliente join endereco on cliente.id_endereco = endereco.id WHERE cliente.id = ?";
-    public static final String SQL_CLIENTE_FIND_ALL = "SELECT * FROM cliente";
+    public static final String SQL_CLIENTE_FIND_ALL = "SELECT * FROM cliente join endereco on cliente.id_endereco = endereco.id";
     public static final String SQL_CLIENTE_DELETE = "DELETE FROM cliente WHERE id = ?";
 
     /*================CartaoDAO=================*/
@@ -21,7 +19,7 @@ public class SqlUtils {
     /*================ContaDAO=================*/
     public static final String SQL_CONTA_INSERT = "INSERT INTO conta (agencia, chave_pix, numero, saldo, senha, tipo_conta, id_cliente) VALUES (?, ?, ?, ?, ?, ?, ?)";
     public static final String SQL_CONTA_DELETE = "DELETE FROM conta WHERE id = ?";
-    public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta WHERE id = ?";
+    public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta join  cartao on conta.id = cartao.id_conta WHERE id = ? ";
     public static final String SQL_CONTA_FIND_BY_PIX = "SELECT * FROM conta WHERE chave_pix = ?";
     public static final String SQL_CONTA_FIND_BY_AGENCIA_NUMERO = "SELECT * FROM conta WHERE agencia = ? AND numero = ?";
 

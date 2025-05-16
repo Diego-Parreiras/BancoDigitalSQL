@@ -12,10 +12,10 @@ public class TransferenciaRowMapper implements RowMapper<Transferencia> {
     public Transferencia mapRow(ResultSet rs, int rowNum) throws SQLException {
         Transferencia transferencia = new Transferencia();
         transferencia.setId(rs.getLong("id"));
-        transferencia.setIdContaOrigem(rs.getLong("id_conta_origem"));
-        transferencia.setIdContaDestino(rs.getLong("id_conta_destino"));
-        transferencia.setValor(rs.getDouble("valor"));
         transferencia.setDataTransferencia(rs.getTimestamp("data_transferencia").toLocalDateTime());
+        transferencia.setIdContaDestino(rs.getLong("id_conta_destino"));
+        transferencia.setIdContaOrigem(rs.getLong("id_conta_origem"));
+        transferencia.setValor(rs.getDouble("valor"));
         return transferencia;
     }
 }

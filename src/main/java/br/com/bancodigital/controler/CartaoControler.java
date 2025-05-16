@@ -1,10 +1,10 @@
 package br.com.bancodigital.controler;
 
-import br.com.bancodigital.model.Cartao;
 import br.com.bancodigital.model.CartaoDeCredito;
 import br.com.bancodigital.model.CartaoDeDebito;
 import br.com.bancodigital.model.dto.PagamentoCartaoRequest;
 import br.com.bancodigital.service.CartaoService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -3,7 +3,6 @@ package br.com.bancodigital.dao.daoimplements;
 import br.com.bancodigital.dao.interfaces.EnderecoDao;
 import br.com.bancodigital.dao.utils.SqlUtils;
 import br.com.bancodigital.model.Endereco;
-import br.com.bancodigital.model.rowmapper.EnderecoRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,13 +10,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class EnderecoDaoImplements implements EnderecoDao {
     @Autowired
-    private EnderecoRowMapper enderecoRowMapper;
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Override
     public Long save(Endereco endereco) {
-        try{
+        try {
             jdbcTemplate.update(
                     SqlUtils.SQL_ENDERECO_INSERT,
                     endereco.getRua(),
@@ -29,7 +26,7 @@ public class EnderecoDaoImplements implements EnderecoDao {
             );
             return jdbcTemplate.queryForObject(SqlUtils.SQL_BUSCAR_ID_ULTIMO_ENDERECO, Long.class);
 
-    }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("Endereco nao cadastrado " + e.getMessage());
         }
     }

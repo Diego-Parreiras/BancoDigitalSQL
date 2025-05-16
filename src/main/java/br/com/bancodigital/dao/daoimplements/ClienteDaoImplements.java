@@ -37,7 +37,7 @@ public class ClienteDaoImplements implements ClienteDao {
                     cliente.getTipo().getValor()
                     );
         } catch (Exception e) {
-            throw new RuntimeException("Cliente nao cadastrado " + e.getMessage());     //fazer classe de erros com msgs
+            throw new RuntimeException("Cliente nao cadastrado " + e.getMessage());
         }
     }
 
@@ -57,7 +57,7 @@ public class ClienteDaoImplements implements ClienteDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CLIENTE_DELETE, id);
         } catch (Exception e) {
-            throw new RuntimeException("Cliente nao deletado " + e.getMessage());     //fazer classe de erros com msgs
+            throw new RuntimeException("Cliente nao deletado " + e.getMessage());
         }
     }
 }

@@ -2,6 +2,7 @@ package br.com.bancodigital.service;
 
 import br.com.bancodigital.dao.daoimplements.ClienteDaoImplements;
 import br.com.bancodigital.dao.interfaces.EnderecoDao;
+import br.com.bancodigital.exception.ClienteException;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.Endereco;
 import org.slf4j.Logger;
@@ -11,14 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Optional;
 
 @Service
 public class ClienteService {
-
     @Autowired
     private ClienteDaoImplements clienteDao;
     @Autowired
@@ -36,26 +35,19 @@ public class ClienteService {
         logger.info("Cliente cadastrado com sucesso");
     }
 
-   /* public static String imprimeCPF(String CPF) {
-        return (CPF.substring(0, 3) + "." + CPF.substring(3, 6) + "." +
-                CPF.substring(6, 9) + "-" + CPF.substring(9, 11));
-    }*/
-
     public Cliente buscarId(Long id) {
         logger.info("Buscando cliente");
         Optional<Cliente> cliente = clienteDao.findById(id);
         if (cliente.isPresent()) {
             logger.info("Cliente encontrado");
             return cliente.get();
-
         }
         logger.info("Cliente nao encontrado");
-        throw new RuntimeException("Cliente não encontrado");
+        throw ClienteException.clienteNaoEncontrado();
     }
 
     @Transactional
     public void atualizar(Long id, Cliente cliente) {
-        /*Atualiza os dados do cliente*/
         logger.info("Atualizando cliente");
         Cliente clienteAtualizar = buscarId(id);
         try {
@@ -71,20 +63,17 @@ public class ClienteService {
             logger.info("Cliente atualizado com sucesso");
         } catch (Exception e) {
             logger.info("Cliente nao atualizado " + e.getMessage());
-            throw new RuntimeException("Cliente nao atualizado " + e.getMessage());
+            throw ClienteException.clienteNaoAtualizado(e.getMessage());
         }
-
-
     }
 
     @Transactional
     public void apagar(Long id) {
-        /*Verifica se o cliente existe para entao deletar*/
         logger.info("Deletando cliente");
         Optional<Cliente> optional = clienteDao.findById(id);
         if (!optional.isPresent()) {
             logger.info("Cliente nao encontrado");
-            throw new RuntimeException("Cliente não encontrado");
+            throw ClienteException.clienteNaoEncontrado();
         }
         logger.info("Cliente deletado com sucesso");
         clienteDao.delete(optional.get().getId());
@@ -96,7 +85,6 @@ public class ClienteService {
     }
 
     private void verificarDadosCliente(Cliente cliente) {
-        /*Verifica os dados do cliente estao compativel*/
         logger.info("Verificando dados do cliente");
         verificarClienteExiste(cliente);
         validarNome(cliente.getNome());
@@ -108,12 +96,11 @@ public class ClienteService {
     private void verificarClienteExiste(Cliente cliente) {
         if (clienteDao.existsByCpf(cliente.getCpf())) {
             logger.info("CPF já cadastrado");
-            throw new RuntimeException("CPF já cadastrado");
+            throw ClienteException.cpfJaCadastrado();
         }
     }
 
     private void validarEndereco(Endereco endereco) {
-        /*Verifica o endereco do cliente*/
         logger.info("Validando endereço");
         String regexCep = "^\\d{5}-\\d{3}$";
 
@@ -122,13 +109,12 @@ public class ClienteService {
                 (endereco.getRua() == null || endereco.getRua().isEmpty()) ||
                 (endereco.getNumero() == null || endereco.getNumero().isEmpty())) {
             logger.info("Endereço inválido");
-            throw new RuntimeException("Endereço inválido");
+            throw ClienteException.enderecoInvalido();
         }
         logger.info("Endereço válido");
     }
 
     private void validarDataDeNascimento(String data) {
-        /*Valida se o cliente e maior de idade*/
         logger.info("Validando data de nascimento");
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
@@ -137,7 +123,7 @@ public class ClienteService {
             dataNascimentoDate = sdf.parse(data);
         } catch (Exception e) {
             logger.info("Formato de data inválido");
-            throw new RuntimeException("Formato de data inválido");
+            throw ClienteException.formatoDataInvalido();
         }
         Date dataAtual = new Date();
         int idade = dataAtual.getYear() - dataNascimentoDate.getYear();
@@ -148,17 +134,16 @@ public class ClienteService {
 
         if (idade < 18) {
             logger.info("O cliente deve ter mais de 18 anos");
-            throw new RuntimeException("O cliente deve ter mais de 18 anos");
+            throw ClienteException.menorDeIdade();
         }
     }
 
     private void validarCpf(String CPF) {
-        /*Validador de cpf com regex para formatar o cpf*/
         logger.info("Validando CPF");
         String regex = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}";
 
         if (!CPF.matches(regex)) {
-            throw new RuntimeException("Formato de CPF inválido");
+            throw ClienteException.formatoCpfInvalido();
         }
         CPF = CPF.replace(".", "").replace("-", "");
 
@@ -169,20 +154,15 @@ public class ClienteService {
                 CPF.equals("66666666666") || CPF.equals("77777777777") ||
                 CPF.equals("88888888888") || CPF.equals("99999999999") ||
                 (CPF.length() != 11))
-            throw new RuntimeException("CPF inválido");
+            throw ClienteException.cpfInvalido();
 
         char dig10, dig11;
         int sm, i, r, num, peso;
 
-
         try {
-            // Calculo do 1o. Digito Verificador
             sm = 0;
             peso = 10;
             for (i = 0; i < 9; i++) {
-                // converte o i-esimo caractere do CPF em um numero:
-                // por exemplo, transforma o caractere "0" no inteiro 0
-                // (48 eh a posicao de "0" na tabela ASCII)
                 num = (int) (CPF.charAt(i) - 48);
                 sm = sm + (num * peso);
                 peso = peso - 1;
@@ -191,9 +171,8 @@ public class ClienteService {
             r = 11 - (sm % 11);
             if ((r == 10) || (r == 11))
                 dig10 = '0';
-            else dig10 = (char) (r + 48); // converte no respectivo caractere numerico
+            else dig10 = (char) (r + 48);
 
-            // Calculo do 2o. Digito Verificador
             sm = 0;
             peso = 11;
             for (i = 0; i < 10; i++) {
@@ -207,29 +186,26 @@ public class ClienteService {
                 dig11 = '0';
             else dig11 = (char) (r + 48);
 
-            // Verifica se os digitos calculados conferem com os digitos informados.
             if ((dig10 != CPF.charAt(9)) && (dig11 != CPF.charAt(10))) {
                 logger.info("CPF inválido");
-                throw new RuntimeException("CPF inválido");
+                throw ClienteException.cpfInvalido();
             }
 
         } catch (InputMismatchException erro) {
             logger.info("CPF inválido");
-            throw new RuntimeException("CPF inválido");
+            throw ClienteException.cpfInvalido();
         }
     }
 
     private void validarNome(String nome) {
-        /*Valida se o nome tem apenas letras*/
         String regex = "^[A-Za-zÀ-ÖØ-öø-ÿ ]+$";
 
         if (!nome.matches(regex)) {
             logger.info("O nome deve conter apenas letras.");
-            throw new RuntimeException("O nome deve conter apenas letras.");
+            throw ClienteException.nomeInvalido();
         } else if (nome.length() < 2 || nome.length() > 100) {
             logger.info("O nome deve ter entre 2 e 100 caracteres.");
-            throw new RuntimeException("O nome deve ter entre 2 e 100 caracteres.");
+            throw ClienteException.nomeTamanhoInvalido();
         }
     }
-
 }

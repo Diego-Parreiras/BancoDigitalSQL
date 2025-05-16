@@ -12,12 +12,12 @@ public class EnderecoRowMapper implements RowMapper<Endereco> {
     public Endereco mapRow(ResultSet rs, int rowNum) throws SQLException {
         Endereco endereco = new Endereco();
         endereco.setId(rs.getLong("id"));
-        endereco.setRua(rs.getString("rua"));
-        endereco.setNumero(rs.getString("numero"));
         endereco.setCep(rs.getString("cep"));
-        endereco.setComplemento(rs.getString("complemento"));
         endereco.setCidade(rs.getString("cidade"));
+        endereco.setComplemento(rs.getString("complemento"));
         endereco.setEstado(rs.getString("estado"));
+        endereco.setNumero(rs.getString("numero"));
+        endereco.setRua(rs.getString("rua"));
         return endereco;
     }
 }

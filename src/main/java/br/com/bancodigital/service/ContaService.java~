@@ -254,7 +254,6 @@ public class ContaService {
 
     private void verificarSaldo(double saldo, double valor) {
         if (saldo >= valor) {
-            logger.info(ServiceUtils.SALDO_INSUFICIENTE);
             throw ContaException.saldoInsuficiente();
         }
     }

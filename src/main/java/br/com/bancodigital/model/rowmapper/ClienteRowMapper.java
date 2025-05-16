@@ -18,15 +18,19 @@ public class ClienteRowMapper implements RowMapper<Cliente> {
         cliente.setNome(rs.getString("nome"));
         cliente.setCpf(rs.getString("cpf"));
         cliente.setDataNascimento(rs.getString("data_nascimento"));
+
+
         cliente.setTipo(TipoCliente.fromInt(rs.getInt("tipo")));// transforma o int em enum
+
+
         cliente.setEndereco(new Endereco());
         cliente.getEndereco().setId(rs.getLong("id_endereco"));
-        cliente.getEndereco().setRua(rs.getString("rua"));
-        cliente.getEndereco().setNumero(rs.getString("numero"));
         cliente.getEndereco().setCep(rs.getString("cep"));
-        cliente.getEndereco().setComplemento(rs.getString("complemento"));
         cliente.getEndereco().setCidade(rs.getString("cidade"));
+        cliente.getEndereco().setComplemento(rs.getString("complemento"));
         cliente.getEndereco().setEstado(rs.getString("estado"));
+        cliente.getEndereco().setNumero(rs.getString("numero"));
+        cliente.getEndereco().setRua(rs.getString("rua"));
         return cliente;
     }
 }
