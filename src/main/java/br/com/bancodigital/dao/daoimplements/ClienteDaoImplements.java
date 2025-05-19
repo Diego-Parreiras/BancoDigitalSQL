@@ -2,10 +2,13 @@ package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.ClienteDao;
 import br.com.bancodigital.dao.utils.SqlUtils;
+import br.com.bancodigital.exception.JavaException;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.rowmapper.ClienteRowMapper;
+import br.com.bancodigital.service.utils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -37,7 +40,7 @@ public class ClienteDaoImplements implements ClienteDao {
                     cliente.getTipo().getValor()
                     );
         } catch (Exception e) {
-            throw new RuntimeException("Cliente nao cadastrado " + e.getMessage());
+            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -57,7 +60,7 @@ public class ClienteDaoImplements implements ClienteDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CLIENTE_DELETE, id);
         } catch (Exception e) {
-            throw new RuntimeException("Cliente nao deletado " + e.getMessage());
+            throw new JavaException(ServiceUtils.ERRO_AO_DELETAR, HttpStatus.NOT_FOUND.value());
         }
     }
 }

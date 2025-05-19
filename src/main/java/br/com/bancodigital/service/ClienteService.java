@@ -2,12 +2,14 @@ package br.com.bancodigital.service;
 
 import br.com.bancodigital.dao.daoimplements.ClienteDaoImplements;
 import br.com.bancodigital.dao.interfaces.EnderecoDao;
-import br.com.bancodigital.exception.ClienteException;
+import br.com.bancodigital.exception.JavaException;
 import br.com.bancodigital.model.Cliente;
 import br.com.bancodigital.model.Endereco;
+import br.com.bancodigital.service.utils.ServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,28 +29,28 @@ public class ClienteService {
 
     @Transactional
     public void cadastrar(Cliente cliente) {
-        logger.info("Iniciando cadastro de cliente");
+        logger.info(ServiceUtils.CADASTRANDO_CLIENTE);
         verificarDadosCliente(cliente);
         Long idEndereco = enderecoDao.save(cliente.getEndereco());
         cliente.getEndereco().setId(idEndereco);
         clienteDao.save(cliente);
-        logger.info("Cliente cadastrado com sucesso");
+        logger.info(ServiceUtils.CLIENTE_CADASTRADO);
     }
 
     public Cliente buscarId(Long id) {
-        logger.info("Buscando cliente");
+        logger.info(ServiceUtils.BUSCANDO_CLIENTE);
         Optional<Cliente> cliente = clienteDao.findById(id);
         if (cliente.isPresent()) {
-            logger.info("Cliente encontrado");
+            logger.info(ServiceUtils.CLIENTE_ENCONTRADO);
             return cliente.get();
         }
-        logger.info("Cliente nao encontrado");
-        throw ClienteException.clienteNaoEncontrado();
+        logger.info(ServiceUtils.NAO_ENCONTRADO);
+        throw new JavaException(ServiceUtils.NAO_ENCONTRADO, HttpStatus.NOT_FOUND.value());
     }
 
     @Transactional
     public void atualizar(Long id, Cliente cliente) {
-        logger.info("Atualizando cliente");
+        logger.info(ServiceUtils.ATUALIZANDO_CLIENTE);
         Cliente clienteAtualizar = buscarId(id);
         try {
             validarNome(cliente.getNome());
@@ -60,32 +62,32 @@ public class ClienteService {
             clienteAtualizar.setDataNascimento(cliente.getDataNascimento());
             clienteAtualizar.setEndereco(cliente.getEndereco());
             clienteDao.save(clienteAtualizar);
-            logger.info("Cliente atualizado com sucesso");
+            logger.info(ServiceUtils.CLIENTE_ATUALIZADO);
         } catch (Exception e) {
-            logger.info("Cliente nao atualizado " + e.getMessage());
-            throw ClienteException.clienteNaoAtualizado(e.getMessage());
+            logger.info(ServiceUtils.CLIENTE_NAO_ATUALIZADO);
+            throw new JavaException(ServiceUtils.CLIENTE_NAO_ATUALIZADO, HttpStatus.BAD_REQUEST.value());
         }
     }
 
     @Transactional
     public void apagar(Long id) {
-        logger.info("Deletando cliente");
+        logger.info(ServiceUtils.REMOVENDO_CLIENTE);
         Optional<Cliente> optional = clienteDao.findById(id);
         if (!optional.isPresent()) {
-            logger.info("Cliente nao encontrado");
-            throw ClienteException.clienteNaoEncontrado();
+            logger.info(ServiceUtils.NAO_ENCONTRADO);
+            throw new JavaException(ServiceUtils.NAO_ENCONTRADO, HttpStatus.NOT_FOUND.value());
         }
-        logger.info("Cliente deletado com sucesso");
+        logger.info(ServiceUtils.CLIENTE_REMOVIDO);
         clienteDao.delete(optional.get().getId());
     }
 
     public Object buscarTodos() {
-        logger.info("Buscando todos os clientes");
+        logger.info(ServiceUtils.BUSCANDO_TODOS);
         return clienteDao.findAll();
     }
 
     private void verificarDadosCliente(Cliente cliente) {
-        logger.info("Verificando dados do cliente");
+        logger.info(ServiceUtils.VALIDANDO_DADOS_CLIENTE);
         verificarClienteExiste(cliente);
         validarNome(cliente.getNome());
         validarCpf(cliente.getCpf());
@@ -95,35 +97,35 @@ public class ClienteService {
 
     private void verificarClienteExiste(Cliente cliente) {
         if (clienteDao.existsByCpf(cliente.getCpf())) {
-            logger.info("CPF já cadastrado");
-            throw ClienteException.cpfJaCadastrado();
+            logger.info(ServiceUtils.CPF_INVALIDO);
+            throw new JavaException(ServiceUtils.CPF_INVALIDO, HttpStatus.BAD_REQUEST.value());
         }
     }
 
     private void validarEndereco(Endereco endereco) {
-        logger.info("Validando endereço");
+        logger.info(ServiceUtils.VALIDANDO_DADOS_CLIENTE);
         String regexCep = "^\\d{5}-\\d{3}$";
 
         if ((endereco.getCidade() == null || endereco.getCidade().isEmpty()) ||
                 (endereco.getEstado() == null || endereco.getEstado().isEmpty()) ||
                 (endereco.getRua() == null || endereco.getRua().isEmpty()) ||
                 (endereco.getNumero() == null || endereco.getNumero().isEmpty())) {
-            logger.info("Endereço inválido");
-            throw ClienteException.enderecoInvalido();
+            logger.info(ServiceUtils.ENDERECO_INVALIDO);
+            throw new JavaException(ServiceUtils.ENDERECO_INVALIDO, HttpStatus.BAD_REQUEST.value());
         }
-        logger.info("Endereço válido");
+        logger.info(ServiceUtils.SUCESSO);
     }
 
     private void validarDataDeNascimento(String data) {
-        logger.info("Validando data de nascimento");
+        logger.info(ServiceUtils.VALIDANDO_DADOS_CLIENTE);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
         Date dataNascimentoDate = null;
         try {
             dataNascimentoDate = sdf.parse(data);
         } catch (Exception e) {
-            logger.info("Formato de data inválido");
-            throw ClienteException.formatoDataInvalido();
+            logger.info(ServiceUtils.DATA_NASCIMENTO_INVALIDA);
+            throw new JavaException(ServiceUtils.DATA_NASCIMENTO_INVALIDA, HttpStatus.BAD_REQUEST.value());
         }
         Date dataAtual = new Date();
         int idade = dataAtual.getYear() - dataNascimentoDate.getYear();
@@ -133,17 +135,17 @@ public class ClienteService {
         }
 
         if (idade < 18) {
-            logger.info("O cliente deve ter mais de 18 anos");
-            throw ClienteException.menorDeIdade();
+            logger.info(ServiceUtils.IDADE_INVALIDA);
+            throw new JavaException(ServiceUtils.IDADE_INVALIDA, HttpStatus.BAD_REQUEST.value());
         }
     }
 
     private void validarCpf(String CPF) {
-        logger.info("Validando CPF");
+        logger.info(ServiceUtils.VALIDANDO_DADOS_CLIENTE);
         String regex = "\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}";
 
         if (!CPF.matches(regex)) {
-            throw ClienteException.formatoCpfInvalido();
+            throw new JavaException(ServiceUtils.CPF_INVALIDO, HttpStatus.BAD_REQUEST.value());
         }
         CPF = CPF.replace(".", "").replace("-", "");
 
@@ -154,7 +156,7 @@ public class ClienteService {
                 CPF.equals("66666666666") || CPF.equals("77777777777") ||
                 CPF.equals("88888888888") || CPF.equals("99999999999") ||
                 (CPF.length() != 11))
-            throw ClienteException.cpfInvalido();
+            throw new JavaException(ServiceUtils.CPF_INVALIDO, HttpStatus.BAD_REQUEST.value());
 
         char dig10, dig11;
         int sm, i, r, num, peso;
@@ -187,13 +189,13 @@ public class ClienteService {
             else dig11 = (char) (r + 48);
 
             if ((dig10 != CPF.charAt(9)) && (dig11 != CPF.charAt(10))) {
-                logger.info("CPF inválido");
-                throw ClienteException.cpfInvalido();
+                logger.info(ServiceUtils.CPF_INVALIDO);
+                throw new JavaException(ServiceUtils.CPF_INVALIDO, HttpStatus.BAD_REQUEST.value());
             }
 
         } catch (InputMismatchException erro) {
-            logger.info("CPF inválido");
-            throw ClienteException.cpfInvalido();
+            logger.info(ServiceUtils.CPF_INVALIDO);
+            throw new JavaException(ServiceUtils.CPF_INVALIDO, HttpStatus.BAD_REQUEST.value());
         }
     }
 
@@ -201,11 +203,11 @@ public class ClienteService {
         String regex = "^[A-Za-zÀ-ÖØ-öø-ÿ ]+$";
 
         if (!nome.matches(regex)) {
-            logger.info("O nome deve conter apenas letras.");
-            throw ClienteException.nomeInvalido();
+            logger.info(ServiceUtils.NOME_APENAS_LETRAS);
+            throw new JavaException(ServiceUtils.NOME_APENAS_LETRAS, HttpStatus.BAD_REQUEST.value());
         } else if (nome.length() < 2 || nome.length() > 100) {
-            logger.info("O nome deve ter entre 2 e 100 caracteres.");
-            throw ClienteException.nomeTamanhoInvalido();
+            logger.info(ServiceUtils.NOME_TAMANHO_INVALIDO);
+            throw new JavaException(ServiceUtils.NOME_TAMANHO_INVALIDO, HttpStatus.BAD_REQUEST.value());
         }
     }
 }

@@ -93,7 +93,7 @@ public class CartaoService {
     }
 
     public void mudarStatus(Long id) {
-        logger.info(ServiceUtils.MUDANDO_STATUS + id);
+        logger.info("" + id);
         Cartao cartao = buscarId(id);
         if (cartao instanceof CartaoDeCredito) {
             logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO + cartao.getId());

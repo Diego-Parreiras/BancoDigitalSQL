@@ -19,16 +19,20 @@ public class SqlUtils {
     /*================ContaDAO=================*/
     public static final String SQL_CONTA_INSERT = "INSERT INTO conta (agencia, chave_pix, numero, saldo, senha, tipo_conta, id_cliente) VALUES (?, ?, ?, ?, ?, ?, ?)";
     public static final String SQL_CONTA_DELETE = "DELETE FROM conta WHERE id = ?";
-    public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta join  cartao on conta.id = cartao.id_conta WHERE id = ? ";
+    public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta WHERE id = ? ";
+    public static final String SQL_CONTA_FIND_ALL_CARTOES = "SELECT * FROM cartao WHERE id_conta = ?";
     public static final String SQL_CONTA_FIND_BY_PIX = "SELECT * FROM conta WHERE chave_pix = ?";
     public static final String SQL_CONTA_FIND_BY_AGENCIA_NUMERO = "SELECT * FROM conta WHERE agencia = ? AND numero = ?";
 
     /*================TransferenciaDAO=================*/
-    public static final String SQL_TRANSFERENCIA_SAVE = "INSERT INTO transferencia (id_conta_origem, id_conta_destino, valor) VALUES (?, ?, ?)";
+    public static final String SQL_TRANSFERENCIA_SAVE = "INSERT INTO transferencia (data_transferencia,id_conta_destino,id_conta_origem,  valor) VALUES (?, ?, ?, ?)";
 
     /*================EnderecoDAO======================*/
     public static final String SQL_ENDERECO_INSERT = "INSERT INTO endereco (rua, numero, complemento, cep, cidade, estado) " + "VALUES (?, ?, ?, ?, ?, ?)";
 
     public static final String SQL_BUSCAR_ID_ULTIMO_ENDERECO = "SELECT id FROM endereco ORDER BY id DESC LIMIT 1";
+
+    public static final String SQL_CONTA_DEPOSITAR = "UPDATE conta SET saldo = saldo + ? WHERE id = ?";
+    public static final String SQL_CONTA_SACAR =     "UPDATE conta SET saldo = saldo - ? WHERE id = ?";
 
 }

@@ -19,20 +19,6 @@ public class ContaRowMapper implements RowMapper<Conta> {
         conta.setSaldo(rs.getDouble("saldo"));
         conta.setSenha(rs.getLong("senha"));
         conta.setTipoConta(TipoConta.fromInt(rs.getInt("tipo_conta")));
-        conta.setListaCartoes(rs.getLong("lista_cartoes"));
-        conta.getListaCartoes().set(rs.getLong("id"));
-        conta.getListaCartoes().geAtivoOuNao(rs.getBoolean("ativo_ou_nao"));
-        conta.getListaCartoes().setCvv(rs.getLong("cvv"));
-        conta.getListaCartoes().setLimiteCredito(rs.getDouble("limite_credito"));
-        conta.getListaCartoes().setLimiteDiario(rs.getDouble("limite_diario"));
-        conta.getListaCartoes().setNumero(rs.getLong("numero"));
-        conta.getListaCartoes().setSenha(rs.getLong("senha"));
-        conta.getListaCartoes().setTipoCartao(rs.getString("tipo_cartao"));
-        conta.getListaCartoes().setFatura(rs.getDouble("fatura"));
-
-
-
-
         return conta;
     }
 }

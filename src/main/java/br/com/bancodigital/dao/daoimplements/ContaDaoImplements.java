@@ -2,12 +2,22 @@ package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.ContaDao;
 import br.com.bancodigital.dao.utils.SqlUtils;
+import br.com.bancodigital.exception.JavaException;
+import br.com.bancodigital.model.Cartao;
 import br.com.bancodigital.model.Conta;
+import br.com.bancodigital.model.rowmapper.CartaoRowMapper;
 import br.com.bancodigital.model.rowmapper.ContaRowMapper;
+import br.com.bancodigital.service.ContaService;
+import br.com.bancodigital.service.utils.ServiceUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +26,10 @@ public class ContaDaoImplements implements ContaDao {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ContaRowMapper contaRowMapper;
+    @Autowired
+    private CartaoRowMapper cartaoRowMapper;
+    private final Logger logger = LoggerFactory.getLogger(ContaDaoImplements.class);
+
 
     @Override
     public void save(Conta conta) {
@@ -29,7 +43,7 @@ public class ContaDaoImplements implements ContaDao {
                     conta.getTipoConta().ordinal(),
                     conta.getCliente().getId());
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao cadastrar conta" + e.getMessage());
+            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -38,7 +52,7 @@ public class ContaDaoImplements implements ContaDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CONTA_DELETE, id);
         } catch (Exception e) {
-            throw new RuntimeException("Nao foi possivel deletar Conta" + e.getMessage());
+            throw new JavaException(ServiceUtils.ERRO_AO_DELETAR, HttpStatus.NOT_FOUND.value());
         }
     }
 
@@ -46,6 +60,13 @@ public class ContaDaoImplements implements ContaDao {
     public Optional<Conta> findById(Long id) {
         try {
             Conta conta = jdbcTemplate.queryForObject(SqlUtils.SQL_CONTA_FIND_BY_ID, contaRowMapper, id);
+            List<Cartao> listaDeCartaoes = jdbcTemplate.query(SqlUtils.SQL_CONTA_FIND_ALL_CARTOES, cartaoRowMapper, id);
+            if (listaDeCartaoes.isEmpty()) {
+                logger.info(ServiceUtils.NENHUM_CARTAO_ENCONTRADO);
+               conta.setListaCartoes(new ArrayList<>());
+               return Optional.of(conta);
+            }
+            conta.setListaCartoes(listaDeCartaoes);
             return Optional.of(conta);
         } catch (Exception e) {
             return Optional.empty();
@@ -71,4 +92,24 @@ public class ContaDaoImplements implements ContaDao {
             return Optional.empty();
         }
     }
+
+    @Override
+    public void depositor(Long id, double valor) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CONTA_DEPOSITAR, valor, id);
+        } catch (Exception e) {
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+
+    }
+
+    @Override
+    public void sacar(Long id, double valor) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CONTA_SACAR, valor, id);
+        } catch (Exception e) {
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+    }
+
 }

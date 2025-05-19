@@ -13,4 +13,8 @@ public interface ContaDao {
     Optional<Conta> findByChavePix(String chavePix);
 
     Optional<Conta> findByAgenciaAndNumero(Long agencia, Long numero);
+
+    void depositor(Long id, double valor);
+
+    void sacar(Long id, double valor);
 }

@@ -26,7 +26,4 @@ public class Conta {
 
     @JsonManagedReference
     private List<Cartao> listaCartoes;
-
-    public void setListaCartoes(long listaCartoes) {
-    }
 }
