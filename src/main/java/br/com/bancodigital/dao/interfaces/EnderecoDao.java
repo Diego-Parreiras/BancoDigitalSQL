@@ -1,6 +1,6 @@
 package br.com.bancodigital.dao.interfaces;
 
-import br.com.bancodigital.model.Endereco;
+import br.com.bancodigital.model.entity.Endereco;
 
 public interface EnderecoDao {
 

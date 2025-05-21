@@ -1,6 +1,8 @@
 package br.com.bancodigital.dao.interfaces;
 
-import br.com.bancodigital.model.Conta;
+import br.com.bancodigital.model.entity.Conta;
+import br.com.bancodigital.model.entity.Transferencia;
+
 import java.util.Optional;
 
 public interface ContaDao {
@@ -17,4 +19,6 @@ public interface ContaDao {
     void depositor(Long id, double valor);
 
     void sacar(Long id, double valor);
+
+    Transferencia tranferir(Long idOrigem, Long idDestino, double valor);
 }

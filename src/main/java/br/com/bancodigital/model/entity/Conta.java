@@ -1,4 +1,4 @@
-package br.com.bancodigital.model;
+package br.com.bancodigital.model.entity;
 
 import br.com.bancodigital.model.enuns.TipoConta;
 import com.fasterxml.jackson.annotation.JsonBackReference;

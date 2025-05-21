@@ -1,6 +1,6 @@
 package br.com.bancodigital.model.rowmapper;
 
-import br.com.bancodigital.model.Transferencia;
+import br.com.bancodigital.model.entity.Transferencia;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

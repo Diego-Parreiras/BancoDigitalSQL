@@ -1,6 +1,6 @@
 package br.com.bancodigital.dao.interfaces;
 
-import br.com.bancodigital.model.Cliente;
+import br.com.bancodigital.model.entity.Cliente;
 import java.util.List;
 import java.util.Optional;
 

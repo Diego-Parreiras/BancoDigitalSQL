@@ -3,12 +3,12 @@ package br.com.bancodigital.service;
 import br.com.bancodigital.dao.daoimplements.CartaoDaoImplements;
 import br.com.bancodigital.dao.daoimplements.ContaDaoImplements;
 import br.com.bancodigital.exception.JavaException;
-import br.com.bancodigital.model.Cartao;
-import br.com.bancodigital.model.CartaoDeCredito;
-import br.com.bancodigital.model.CartaoDeDebito;
+import br.com.bancodigital.model.entity.Cartao;
+import br.com.bancodigital.model.entity.CartaoDeCredito;
+import br.com.bancodigital.model.entity.CartaoDeDebito;
 import br.com.bancodigital.model.dto.PagamentoCartaoRequest;
 import br.com.bancodigital.model.enuns.TipoCliente;
-import br.com.bancodigital.service.utils.ServiceUtils;
+import br.com.bancodigital.constantutils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -83,7 +83,7 @@ public class CartaoService {
         Cartao cartao = buscarId(id);
         verStatus(cartao);
         if (cartao instanceof CartaoDeDebito) {
-            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO + cartao.getId());
+            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO , cartao.getId());
             ((CartaoDeDebito) cartao).setLimiteDiario(valor);
             logger.info(ServiceUtils.SUCESSO);
             return;
@@ -96,7 +96,7 @@ public class CartaoService {
         logger.info(ServiceUtils.MUDANDO_STATUS + id);
         Cartao cartao = buscarId(id);
         if (cartao instanceof CartaoDeCredito) {
-            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO + cartao.getId());
+            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO ,cartao.getId());
             if (((CartaoDeCredito) cartao).getFatura() != 0) {
                 logger.info(ServiceUtils.FATURA_PENDENTE);
                 throw new JavaException(ServiceUtils.FATURA_PENDENTE, HttpStatus.NOT_ACCEPTABLE.value());
@@ -119,7 +119,7 @@ public class CartaoService {
         logger.info(ServiceUtils.BUSCANDO_FATURA + id);
         Cartao cartao = buscarId(id);
         if (cartao instanceof CartaoDeCredito) {
-            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO + cartao.getId());
+            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO , cartao.getId());
             return ((CartaoDeCredito) cartao).getFatura();
         }
         logger.info(ServiceUtils.CARTAO_NAO_E_CREDITO);
@@ -190,7 +190,7 @@ public class CartaoService {
             logger.info(ServiceUtils.SUCESSO);
 
         } else if (cartao instanceof CartaoDeDebito) {
-            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO + cartao.getId());
+            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO ,cartao.getId());
 
             if (pagamento.getPagamento() > ((CartaoDeDebito) cartao).getLimiteDiario()) {
                 logger.info(ServiceUtils.LIMITE_INSUFICIENTE);

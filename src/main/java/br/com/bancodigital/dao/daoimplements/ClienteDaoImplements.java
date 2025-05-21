@@ -1,11 +1,11 @@
 package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.ClienteDao;
-import br.com.bancodigital.dao.utils.SqlUtils;
+import br.com.bancodigital.constantutils.SqlUtils;
 import br.com.bancodigital.exception.JavaException;
-import br.com.bancodigital.model.Cliente;
+import br.com.bancodigital.model.entity.Cliente;
 import br.com.bancodigital.model.rowmapper.ClienteRowMapper;
-import br.com.bancodigital.service.utils.ServiceUtils;
+import br.com.bancodigital.constantutils.ServiceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

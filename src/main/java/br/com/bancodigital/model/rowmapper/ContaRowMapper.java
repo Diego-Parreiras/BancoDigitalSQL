@@ -1,6 +1,6 @@
 package br.com.bancodigital.model.rowmapper;
 
-import br.com.bancodigital.model.Conta;
+import br.com.bancodigital.model.entity.Conta;
 import br.com.bancodigital.model.enuns.TipoConta;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;

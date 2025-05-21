@@ -1,7 +1,7 @@
 package br.com.bancodigital.controler;
 
-import br.com.bancodigital.model.CartaoDeCredito;
-import br.com.bancodigital.model.CartaoDeDebito;
+import br.com.bancodigital.model.entity.CartaoDeCredito;
+import br.com.bancodigital.model.entity.CartaoDeDebito;
 import br.com.bancodigital.model.dto.PagamentoCartaoRequest;
 import br.com.bancodigital.service.CartaoService;
 

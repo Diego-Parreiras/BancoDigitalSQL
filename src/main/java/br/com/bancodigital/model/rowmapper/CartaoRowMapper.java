@@ -1,10 +1,10 @@
 package br.com.bancodigital.model.rowmapper;
 
 import br.com.bancodigital.exception.JavaException;
-import br.com.bancodigital.model.Cartao;
-import br.com.bancodigital.model.CartaoDeCredito;
-import br.com.bancodigital.model.CartaoDeDebito;
-import br.com.bancodigital.service.utils.ServiceUtils;
+import br.com.bancodigital.model.entity.Cartao;
+import br.com.bancodigital.model.entity.CartaoDeCredito;
+import br.com.bancodigital.model.entity.CartaoDeDebito;
+import br.com.bancodigital.constantutils.ServiceUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;

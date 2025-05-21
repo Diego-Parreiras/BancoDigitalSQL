@@ -4,13 +4,13 @@ import br.com.bancodigital.dao.daoimplements.ContaDaoImplements;
 import br.com.bancodigital.dao.daoimplements.TransferenciaDaoImplements;
 import br.com.bancodigital.dao.interfaces.ContaDao;
 import br.com.bancodigital.exception.JavaException;
-import br.com.bancodigital.model.Conta;
-import br.com.bancodigital.model.Transferencia;
+import br.com.bancodigital.model.entity.Conta;
+import br.com.bancodigital.model.entity.Transferencia;
 import br.com.bancodigital.model.dto.TransferenciaPixRequest;
 import br.com.bancodigital.model.dto.TransferenciaTedRequest;
 import br.com.bancodigital.model.enuns.TipoCliente;
 import br.com.bancodigital.model.enuns.TipoConta;
-import br.com.bancodigital.service.utils.ServiceUtils;
+import br.com.bancodigital.constantutils.ServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,10 +93,8 @@ public class ContaService {
                     throw new JavaException(ServiceUtils.SENHA_INCORRETA, HttpStatus.UNAUTHORIZED.value());
                 }
 
-                sacar(contaOrigem.getId(), request.getValor());
-                depositar(contaDestino.getId(), request.getValor());
                 logger.info(ServiceUtils.TRANSFERENCIA_REALIZADA_COM_SUCESSO);
-                return registrarTransferencia(request.getIdOrigem(), contaDestino.getId(), request.getValor());
+                return contaDao.tranferir(contaOrigem.getId(), contaDestino.getId(), request.getValor());
             }
             logger.info(ServiceUtils.CONTA_DESTINO_NAO_ENCONTRADA);
             throw new JavaException(ServiceUtils.CONTA_DESTINO_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());

@@ -1,4 +1,4 @@
-package br.com.bancodigital.model;
+package br.com.bancodigital.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CartaoDeCredito extends Cartao{
+public class CartaoDeCredito extends Cartao {
     private double limiteCredito;
     private double fatura;
 }

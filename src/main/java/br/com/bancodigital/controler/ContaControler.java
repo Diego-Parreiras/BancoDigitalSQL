@@ -1,6 +1,6 @@
 package br.com.bancodigital.controler;
 
-import br.com.bancodigital.model.Conta;
+import br.com.bancodigital.model.entity.Conta;
 
 import br.com.bancodigital.model.dto.TransferenciaPixRequest;
 import br.com.bancodigital.model.dto.TransferenciaTedRequest;

@@ -1,4 +1,4 @@
-package br.com.bancodigital.service.utils;
+package br.com.bancodigital.constantutils;
 
 public class ServiceUtils {
 
@@ -31,7 +31,6 @@ public class ServiceUtils {
     public static final String INICIANDO_TAXA_RENDIMENTO = "Iniciando Taxa de Rendimento";
 
     //--------------CLIENTE--------------------//
-
     public static final String CADASTRANDO_CLIENTE = "Cadastrando cliente";
     public static final String CLIENTE_CADASTRADO= "Cliente cadastrado com sucesso";
     public static final String NAO_ENCONTRADO = " Não encontrado";
@@ -45,9 +44,13 @@ public class ServiceUtils {
     public static final String CPF_INVALIDO = "CPF inválido";
     public static final String ENDERECO_INVALIDO = "Endereço inválido";
     public static final String DATA_NASCIMENTO_INVALIDA = "Data de nascimento inválida";
+    public static final String CLIENTE_NAO_ATUALIZADO = "Cliente nao atualizado";
+    public static final String BUSCANDO_TODOS = "Buscando todos os clientes";
+    public static final String IDADE_INVALIDA =  "O cliente deve ter mais de 18 anos";
+    public static final String NOME_APENAS_LETRAS = "O nome deve conter apenas letras";
+    public static final String NOME_TAMANHO_INVALIDO = "O nome deve ter entre 2 e 100 caracteres.";
 
-    //--------------CARTA0----------------------//
-
+    //--------------CARTÃO----------------------//
     public static final String CARTAO_JA_CADASTRADO = "Cartao ja cadastrado";
     public static final String CADASTRANDO_CARTAO = "Iniciando cadastro";
     public static final String POPULANDO_CARTAO = "Completando dados do cartao";
@@ -64,24 +67,19 @@ public class ServiceUtils {
     public static final String CARTAO_NAO_E_DEBITO = "Seu cartao nao e de debito";
     public static final String SENHA_ATUALIZADA = "Senha atualizada com sucesso";
     public static final String STATUS_ALTERADO = "Status do cartao alterado com sucesso";
-    public static final String ERRO_AO_SALVAR= "Nao pode ser salvo";
-    public static final String ERRO_AO_DELETAR = "Houve um erro ao deletar ";
-
-
-    public static final String NAO_FOI_POSSIVEL_REALIZAR_ACAO = "Não foi possível realizar a ação";
-    public static final String NENHUM_CARTAO_ENCONTRADO = "Nenhum cartão encontrado";
-    public static final String ERRO_AO_SALVAR_ENDERECO = "Erro ao salvar endereço";
-    public static final String ERRO_AO_SALVAR_TRANSFERENCIA = "Erro ao salvar transferencia";
     public static final String PAGANDO_FATURA =  "Iniciando pagamento da fatura do cartao de ID " ;
     public static final String VERIFICANDO_DADOS_DO_CARTAO = "Verificando dados do cartao";
     public static final String BUSCANDO_FATURA = "Buscando fatura do cartao de ID " ;
     public static final String ATUALIZANDO_SENHA = "Atualizando senha do cartao de ID ";
     public static final String MUDANDO_STATUS = "Mudando status do cartao de ID" ;
-    public static final String CLIENTE_NAO_ATUALIZADO = "Cliente nao atualizado";
-    public static final String BUSCANDO_TODOS = "Buscando todos os clientes";
-    public static final String IDADE_INVALIDA =  "O cliente deve ter mais de 18 anos";
-    public static final String NOME_APENAS_LETRAS = "O nome deve conter apenas letras";
-    public static final String NOME_TAMANHO_INVALIDO = "O nome deve ter entre 2 e 100 caracteres.";
+
+    //--------------GERAL/ERROS----------------------//
+    public static final String ERRO_AO_SALVAR= "Nao pode ser salvo";
+    public static final String ERRO_AO_DELETAR = "Houve um erro ao deletar ";
+    public static final String NAO_FOI_POSSIVEL_REALIZAR_ACAO = "Não foi possível realizar a ação";
+    public static final String NENHUM_CARTAO_ENCONTRADO = "Nenhum cartão encontrado";
+    public static final String ERRO_AO_SALVAR_ENDERECO = "Erro ao salvar endereço";
+    public static final String ERRO_AO_SALVAR_TRANSFERENCIA = "Erro ao salvar transferencia";
 
     void serviceUtils() {
         //ignorable

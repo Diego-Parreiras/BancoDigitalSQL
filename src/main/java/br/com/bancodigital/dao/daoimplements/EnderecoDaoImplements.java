@@ -1,10 +1,10 @@
 package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.EnderecoDao;
-import br.com.bancodigital.dao.utils.SqlUtils;
+import br.com.bancodigital.constantutils.SqlUtils;
 import br.com.bancodigital.exception.JavaException;
-import br.com.bancodigital.model.Endereco;
-import br.com.bancodigital.service.utils.ServiceUtils;
+import br.com.bancodigital.model.entity.Endereco;
+import br.com.bancodigital.constantutils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;

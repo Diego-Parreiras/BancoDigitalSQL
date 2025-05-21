@@ -1,6 +1,6 @@
 package br.com.bancodigital.model.rowmapper;
 
-import br.com.bancodigital.model.Endereco;
+import br.com.bancodigital.model.entity.Endereco;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 

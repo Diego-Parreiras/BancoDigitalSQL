@@ -2,13 +2,13 @@ package br.com.bancodigital.dao.daoimplements;
 
 import br.com.bancodigital.dao.interfaces.ContaDao;
 import br.com.bancodigital.model.entity.Transferencia;
-import br.com.bancodigital.constantutils.SqlUtils;
+import br.com.bancodigital.utils.SqlUtils;
 import br.com.bancodigital.exception.JavaException;
 import br.com.bancodigital.model.entity.Cartao;
 import br.com.bancodigital.model.entity.Conta;
 import br.com.bancodigital.model.rowmapper.CartaoRowMapper;
 import br.com.bancodigital.model.rowmapper.ContaRowMapper;
-import br.com.bancodigital.constantutils.ServiceUtils;
+import br.com.bancodigital.utils.ServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
