@@ -25,13 +25,14 @@ public class ClienteDaoImplements implements ClienteDao {
 
     @Override
     public boolean existsByCpf(String cpf) {
-        Integer count = jdbcTemplate.queryForObject(SqlUtils.SQL_CLIENTE_EXISTS_BY_CPF, Integer.class, cpf);
-        return count != null && count > 0;
+        return  jdbcTemplate.queryForObject(SqlUtils.SQL_CLIENTE_EXISTS_BY_CPF, Boolean.class, cpf);
     }
 
     @Override
     public void save(Cliente cliente) {
         try {
+            System.out.println(cliente.getTipo());
+
             jdbcTemplate.update(SqlUtils.SQL_CLIENTE_SAVE,
                     cliente.getNome(),
                     cliente.getCpf(),
@@ -39,8 +40,11 @@ public class ClienteDaoImplements implements ClienteDao {
                     cliente.getEndereco().getId(),
                     cliente.getTipo().getValor()
                     );
+            System.out.println(cliente.getTipo());
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR, HttpStatus.NOT_ACCEPTABLE.value());
+            System.out.println(cliente.getTipo());
+            e.printStackTrace();
+            throw new JavaException(/*ServiceUtils.ERRO_AO_SALVAR*/e.getMessage(), HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 

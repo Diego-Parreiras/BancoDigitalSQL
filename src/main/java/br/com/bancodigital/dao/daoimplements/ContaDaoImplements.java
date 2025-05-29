@@ -9,6 +9,8 @@ import br.com.bancodigital.model.entity.Conta;
 import br.com.bancodigital.model.rowmapper.CartaoRowMapper;
 import br.com.bancodigital.model.rowmapper.ContaRowMapper;
 import br.com.bancodigital.constantutils.ServiceUtils;
+import br.com.bancodigital.model.rowmapper.TransferenciaRowMapper;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.rmi.server.ServerCloneException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +33,13 @@ public class ContaDaoImplements implements ContaDao {
     private ContaRowMapper contaRowMapper;
     @Autowired
     private CartaoRowMapper cartaoRowMapper;
-    private final Logger logger = LoggerFactory.getLogger(ContaDaoImplements.class);
+    @Autowired
+    private TransferenciaRowMapper transferenciaRowMapper;
 
+
+    private final Logger logger = LoggerFactory.getLogger(ContaDaoImplements.class);
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime dataTransferencia = LocalDateTime.now();
 
     @Override
     public void save(Conta conta) {
@@ -69,6 +79,9 @@ public class ContaDaoImplements implements ContaDao {
             conta.setListaCartoes(listaDeCartaoes);
             return Optional.of(conta);
         } catch (Exception e) {
+            System.out.println("=== ERRO REAL: " + e.getClass().getSimpleName() + " ===");
+            System.out.println("=== MENSAGEM: " + e.getMessage() + " ===");
+            e.printStackTrace();
             return Optional.empty();
         }
     }
@@ -96,7 +109,7 @@ public class ContaDaoImplements implements ContaDao {
     @Override
     public void depositor(Long id, double valor) {
         try {
-            jdbcTemplate.update(SqlUtils.SQL_CONTA_DEPOSITAR, valor, id);
+            jdbcTemplate.update(SqlUtils.SQL_CONTA_DEPOSITAR,id, valor);
         } catch (Exception e) {
             throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
         }
@@ -106,15 +119,22 @@ public class ContaDaoImplements implements ContaDao {
     @Override
     public void sacar(Long id, double valor) {
         try {
-            jdbcTemplate.update(SqlUtils.SQL_CONTA_SACAR, valor, id);
+            jdbcTemplate.update(SqlUtils.SQL_CONTA_SACAR, id,valor);
         } catch (Exception e) {
+            System.out.println("=== ERRO REAL: " + e.getClass().getSimpleName() + " ===");
             throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
     @Override
     public Transferencia tranferir(Long idOrigem, Long idDestino, double valor) {
-        return null;
+        try {
+            Transferencia transferencia = jdbcTemplate.queryForObject(SqlUtils.SQL_TRANSFERENCIA_SAVE ,transferenciaRowMapper,idOrigem,idDestino,valor);
+            return transferencia;
+        } catch (Exception e) {
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
+        }
     }
+
 
 }

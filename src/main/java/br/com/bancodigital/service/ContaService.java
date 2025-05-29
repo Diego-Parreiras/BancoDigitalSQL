@@ -109,7 +109,7 @@ public class ContaService {
         logger.info(ServiceUtils.FECHANDO_CONTA);
         Conta conta = buscarContaPorId(id);
         if (conta != null) {
-            if (conta.getSaldo() != 0) {
+            if (conta.getSaldo() == 0) {
                 contaDao.deleteById(id);
                 logger.info(ServiceUtils.CONTA_FECHADA_COM_SUCESSO);
             } else {

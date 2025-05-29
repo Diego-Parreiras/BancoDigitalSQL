@@ -12,10 +12,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Data
 public class Transferencia {
+
     private Long id;
     private Long idContaOrigem;
     private Long idContaDestino;
     private double valor;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime dataTransferencia;
+
 }

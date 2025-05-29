@@ -14,15 +14,11 @@ public class ClienteRowMapper implements RowMapper<Cliente> {
     @Override
     public Cliente mapRow(ResultSet rs, int rowNum) throws SQLException {
         Cliente cliente = new Cliente();
-        cliente.setId(rs.getLong("id"));
+        cliente.setId(rs.getLong("id_cliente"));
         cliente.setNome(rs.getString("nome"));
         cliente.setCpf(rs.getString("cpf"));
         cliente.setDataNascimento(rs.getString("data_nascimento"));
-
-
         cliente.setTipo(TipoCliente.fromInt(rs.getInt("tipo")));// transforma o int em enum
-
-
         cliente.setEndereco(new Endereco());
         cliente.getEndereco().setId(rs.getLong("id_endereco"));
         cliente.getEndereco().setCep(rs.getString("cep"));

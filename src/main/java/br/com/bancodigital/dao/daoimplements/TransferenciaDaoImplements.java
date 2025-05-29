@@ -24,6 +24,7 @@ public class TransferenciaDaoImplements implements TransferenciaDao {
                     transferencia.getValor());
             return transferencia;
         } catch (Exception e) {
+            System.out.println("=== ERRO REAL: " + e.getClass().getSimpleName() + " ===");
             throw new JavaException(ServiceUtils.ERRO_AO_SALVAR_TRANSFERENCIA, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
