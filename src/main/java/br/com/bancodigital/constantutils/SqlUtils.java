@@ -19,7 +19,8 @@ public class SqlUtils {
     public static final String SQL_CONTA_FIND_BY_AGENCIA_NUMERO = "SELECT * FROM conta_find_by_agencia_and_numero_v1(?,?);";                     // feito
     public static final String SQL_CONTA_DEPOSITAR = "CALL conta_depositar_v1(?,?)";                                                             // feito
     public static final String SQL_CONTA_SACAR = "CALL conta_sacar_v1(?,?);";                                                                    // feito
-
+    public static final String SQL_APLICAR_TAXA_MANUTENCAO = "CALL aplicar_taxa_manutencao(?)";
+    // feito
     /*================CartaoDAO=================*/
     public static final String SQL_CARTAO_EXISTS_BY_NUMERO = "SELECT cartao_existe_por_numero_v1(?)";                                            // feito
     public static final String SQL_CARTAO_FIND_BY_NUMERO = "SELECT * FROM cartao_por_numero_v1(?)";                                              // feito
