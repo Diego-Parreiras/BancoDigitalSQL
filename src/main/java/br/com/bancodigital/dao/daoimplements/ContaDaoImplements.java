@@ -79,8 +79,6 @@ public class ContaDaoImplements implements ContaDao {
             conta.setListaCartoes(listaDeCartaoes);
             return Optional.of(conta);
         } catch (Exception e) {
-            System.out.println("=== ERRO REAL: " + e.getClass().getSimpleName() + " ===");
-            System.out.println("=== MENSAGEM: " + e.getMessage() + " ===");
             e.printStackTrace();
             return Optional.empty();
         }
@@ -92,6 +90,7 @@ public class ContaDaoImplements implements ContaDao {
             Conta conta = jdbcTemplate.queryForObject(SqlUtils.SQL_CONTA_FIND_BY_PIX, contaRowMapper, chavePix);
             return Optional.of(conta);
         } catch (Exception e) {
+            e.printStackTrace();
             return Optional.empty();
         }
     }
@@ -102,6 +101,7 @@ public class ContaDaoImplements implements ContaDao {
             Conta conta = jdbcTemplate.queryForObject(SqlUtils.SQL_CONTA_FIND_BY_AGENCIA_NUMERO, contaRowMapper, agencia, numero);
             return Optional.of(conta);
         } catch (Exception e) {
+            e.printStackTrace();
             return Optional.empty();
         }
     }

@@ -12,7 +12,7 @@ public class ContaRowMapper implements RowMapper<Conta> {
     @Override
     public Conta mapRow(ResultSet rs, int rowNum) throws SQLException {
         Conta conta = new Conta();
-        conta.setId(rs.getLong("id_conta"));
+        conta.setId(rs.getLong("id"));
         conta.setAgencia(rs.getLong("agencia"));
         conta.setChavePix(rs.getString("chave_pix"));
         conta.setNumero(rs.getLong("numero"));

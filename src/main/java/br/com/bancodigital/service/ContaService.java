@@ -67,7 +67,7 @@ public class ContaService {
                 sacar(contaOrigem.getId(), request.getValor());
                 depositar(contaDestino.getId(), request.getValor());
                 logger.info(ServiceUtils.TRANSFERENCIA_REALIZADA_COM_SUCESSO);
-                return registrarTransferencia(request.getIdContaOrigem(), contaDestino.getId(), request.getValor());
+                return contaDao.tranferir(request.getIdContaOrigem(), contaDestino.getId(), request.getValor());
             }
             logger.info(ServiceUtils.CONTA_DESTINO_NAO_ENCONTRADA);
             throw new JavaException(ServiceUtils.CONTA_DESTINO_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
@@ -116,9 +116,10 @@ public class ContaService {
                 logger.info(ServiceUtils.CONTA_COM_SALDO_NAO_PODE_SER_FECHADA);
                 throw new JavaException(ServiceUtils.CONTA_COM_SALDO_NAO_PODE_SER_FECHADA, HttpStatus.BAD_REQUEST.value());
             }
+        } else {
+            logger.info(ServiceUtils.CONTA_NAO_ENCONTRADA);
+            throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
         }
-        logger.info(ServiceUtils.CONTA_NAO_ENCONTRADA);
-        throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
     }
 
     public double exibirSaldo(Long id) {
@@ -152,12 +153,13 @@ public class ContaService {
         Conta conta = buscarContaPorId(id);
         if (conta != null) {
             verificarSaldo(conta.getSaldo(), valor);
-            contaDao.sacar(id,valor);
+            contaDao.sacar(id, valor);
             logger.info(ServiceUtils.SUCESSO);
-        }else{
-        logger.info(ServiceUtils.CONTA_NAO_ENCONTRADA);
-        throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
-    }}
+        } else {
+            logger.info(ServiceUtils.CONTA_NAO_ENCONTRADA);
+            throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
+        }
+    }
 
     public Conta buscarContaPorId(Long id) {
         logger.info(ServiceUtils.INICIANDO_BUSCA);
@@ -279,16 +281,5 @@ public class ContaService {
             sb.append(CARACTERES.charAt(index));
         }
         return sb.toString();
-    }
-
-    private Transferencia registrarTransferencia(long idContaOrigem, long idContaDestino, double valor) {
-        /*retorna como se fosse um cupom de transferencia*/
-        Transferencia transferencia = new Transferencia();
-        transferencia.setIdContaOrigem(idContaOrigem);
-        transferencia.setIdContaDestino(idContaDestino);
-        transferencia.setValor(valor);
-        transferencia.setDataTransferencia(LocalDateTime.now());
-        transferenciaDao.save(transferencia);
-        return transferencia;
     }
 }

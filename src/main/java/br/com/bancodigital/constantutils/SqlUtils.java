@@ -28,7 +28,7 @@ public class SqlUtils {
 
 
     /*================TransferenciaDAO=================*/
-    public static final String SQL_TRANSFERENCIA_SAVE = "SELECT * FROM transferencia_executar_v1(?, ?, ?, ?)";                                      // feito
+    public static final String SQL_TRANSFERENCIA_SAVE = "SELECT * FROM transferencia_executar_v1(?, ?, ?)";                                      // feito
 
     /*================EnderecoDAO======================*/
     public static final String SQL_ENDERECO_INSERT = "CALL endereco_inserir_v1(?, ?, ?, ?, ?, ?);";                                              //feito
