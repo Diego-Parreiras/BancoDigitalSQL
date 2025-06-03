@@ -1,0 +1,21 @@
+-- FUNCTION: public.cartao_existe_por_numero_v1(bigint)
+
+-- DROP FUNCTION IF EXISTS public.cartao_existe_por_numero_v1(bigint);
+
+CREATE OR REPLACE FUNCTION public.cartao_existe_por_numero_v1(
+	p_numero bigint)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_count FROM cartao WHERE numero = p_numero;
+    RETURN v_count > 0;
+END;
+$BODY$;
+
+ALTER FUNCTION public.cartao_existe_por_numero_v1(bigint)
+    OWNER TO postgres;

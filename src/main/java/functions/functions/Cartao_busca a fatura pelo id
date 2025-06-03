@@ -1,0 +1,21 @@
+-- FUNCTION: public.cartao_buscar_fatura_v1(bigint)
+
+-- DROP FUNCTION IF EXISTS public.cartao_buscar_fatura_v1(bigint);
+
+CREATE OR REPLACE FUNCTION public.cartao_buscar_fatura_v1(
+	p_id bigint)
+    RETURNS double precision
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_fatura double precision;
+BEGIN
+    SELECT COALESCE(fatura, 0.0) INTO v_fatura FROM cartao WHERE id = p_id;
+    RETURN v_fatura;
+END;
+$BODY$;
+
+ALTER FUNCTION public.cartao_buscar_fatura_v1(bigint)
+    OWNER TO postgres;

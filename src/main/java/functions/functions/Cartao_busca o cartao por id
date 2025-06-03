@@ -1,0 +1,32 @@
+-- FUNCTION: public.cartao_por_id_v1(bigint)
+
+-- DROP FUNCTION IF EXISTS public.cartao_por_id_v1(bigint);
+
+CREATE OR REPLACE FUNCTION public.cartao_por_id_v1(
+	p_id bigint)
+    RETURNS TABLE(tipo_cartao character varying, id bigint, ativo_ou_nao boolean, cvv bigint, numero bigint, senha bigint, fatura double precision, limite_diario double precision, id_conta bigint)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.tipo_cartao,
+        c.id,
+        c.ativo_ou_nao,
+        c.cvv,
+        c.numero,
+        c.senha,
+		c.fatura ,
+		c.limite_diario,
+        c.id_conta
+    FROM cartao c
+    WHERE c.id = p_id;
+END;
+$BODY$;
+
+ALTER FUNCTION public.cartao_por_id_v1(bigint)
+    OWNER TO postgres;
