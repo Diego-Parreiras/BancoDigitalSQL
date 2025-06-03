@@ -1,0 +1,31 @@
+-- FUNCTION: public.conta_find_by_id_v1(bigint)
+
+-- DROP FUNCTION IF EXISTS public.conta_find_by_id_v1(bigint);
+
+CREATE OR REPLACE FUNCTION public.conta_find_by_id_v1(
+	p_id bigint)
+    RETURNS TABLE(id bigint, chave_pix character varying, agencia bigint, numero bigint, tipo_conta smallint, saldo double precision, senha bigint, id_cliente bigint)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        conta.id,
+        conta.chave_pix,
+        conta.agencia,
+        conta.numero,
+        conta.tipo_conta,
+        conta.saldo,
+        conta.senha,
+        conta.id_cliente
+    FROM conta
+    WHERE conta.id = p_id;
+END;
+$BODY$;
+
+ALTER FUNCTION public.conta_find_by_id_v1(bigint)
+    OWNER TO postgres;

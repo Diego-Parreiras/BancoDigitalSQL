@@ -80,6 +80,7 @@ public class ServiceUtils {
     public static final String NENHUM_CARTAO_ENCONTRADO = "Nenhum cartão encontrado";
     public static final String ERRO_AO_SALVAR_ENDERECO = "Erro ao salvar endereço";
     public static final String ERRO_AO_SALVAR_TRANSFERENCIA = "Erro ao salvar transferencia";
+    public static final String ERRO_AO_ATUALIZAR = "Erro ao atualizar o client e";
 
     void serviceUtils() {
         //ignorable

@@ -1,0 +1,18 @@
+-- PROCEDURE: public.apagar_conta_v1(bigint)
+
+-- DROP PROCEDURE IF EXISTS public.apagar_conta_v1(bigint);
+
+CREATE OR REPLACE PROCEDURE public.apagar_conta_v1(
+	IN p_id_conta bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    -- Apagar todos os cartões relacionados à conta específica
+    DELETE FROM cartao WHERE id_conta = p_id_conta;
+
+    -- Apagar a conta específica
+    DELETE FROM conta WHERE id = p_id_conta;
+END;
+$BODY$;
+ALTER PROCEDURE public.apagar_conta_v1(bigint)
+    OWNER TO postgres;

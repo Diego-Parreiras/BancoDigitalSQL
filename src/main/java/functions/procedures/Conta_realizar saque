@@ -1,0 +1,37 @@
+-- PROCEDURE: public.conta_sacar_v1(bigint, double precision)
+
+-- DROP PROCEDURE IF EXISTS public.conta_sacar_v1(bigint, double precision);
+
+CREATE OR REPLACE PROCEDURE public.conta_sacar_v1(
+	IN p_id_conta bigint,
+	IN p_valor double precision)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+    v_saldo_atual DOUBLE PRECISION;
+BEGIN
+    -- Verifica se o valor do saque é válido
+    IF p_valor <= 0 THEN
+        RAISE EXCEPTION 'O valor do saque deve ser maior que zero. Valor recebido: %', p_valor;
+    END IF;
+
+    -- Verifica se a conta existe e pega o saldo atual
+    SELECT saldo INTO v_saldo_atual FROM conta WHERE id = p_id_conta;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Conta com ID % não encontrada.', p_id_conta;
+    END IF;
+
+    -- Verifica se há saldo suficiente
+    IF v_saldo_atual < p_valor THEN
+        RAISE EXCEPTION 'Saldo insuficiente. Saldo atual: %, tentativa de saque: %', v_saldo_atual, p_valor;
+    END IF;
+
+    -- Realiza o saque
+    UPDATE conta
+    SET saldo = saldo - p_valor
+    WHERE id = p_id_conta;
+END;
+$BODY$;
+ALTER PROCEDURE public.conta_sacar_v1(bigint, double precision)
+    OWNER TO postgres;

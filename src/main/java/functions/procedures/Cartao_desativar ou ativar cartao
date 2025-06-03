@@ -1,0 +1,32 @@
+-- PROCEDURE: public.cartao_mudar_status_v1(bigint)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_mudar_status_v1(bigint);
+
+CREATE OR REPLACE PROCEDURE public.cartao_mudar_status_v1(
+	IN p_id bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+    v_status_atual boolean;
+    v_novo_status boolean;
+BEGIN
+    -- Busca o status atual do cartão
+    SELECT ativo_ou_nao INTO v_status_atual
+    FROM cartao
+    WHERE id = p_id;
+
+    -- Inverte o status
+    IF v_status_atual = TRUE THEN
+        v_novo_status := FALSE;
+    ELSE
+        v_novo_status := TRUE;
+    END IF;
+
+    -- Atualizar com o novo status
+    UPDATE cartao
+    SET ativo_ou_nao = v_novo_status
+    WHERE id = p_id;
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_mudar_status_v1(bigint)
+    OWNER TO postgres;

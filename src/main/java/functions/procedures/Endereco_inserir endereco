@@ -1,0 +1,28 @@
+-- PROCEDURE: public.endereco_inserir_v1(character varying, character varying, character varying, character varying, character varying, character varying)
+
+-- DROP PROCEDURE IF EXISTS public.endereco_inserir_v1(character varying, character varying, character varying, character varying, character varying, character varying);
+
+CREATE OR REPLACE PROCEDURE public.endereco_inserir_v1(
+	IN p_rua character varying,
+	IN p_numero character varying,
+	IN p_complemento character varying,
+	IN p_cep character varying,
+	IN p_cidade character varying,
+	IN p_estado character varying)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    -- Validações básicas
+    IF p_rua IS NULL OR p_cep IS NULL OR p_cidade IS NULL OR p_estado IS NULL THEN
+        RAISE EXCEPTION 'Rua, CEP, cidade e estado são obrigatórios.';
+    END IF;
+
+    INSERT INTO endereco (
+        rua, numero, complemento, cep, cidade, estado
+    ) VALUES (
+        p_rua, p_numero, p_complemento, p_cep, p_cidade, p_estado
+    );
+END;
+$BODY$;
+ALTER PROCEDURE public.endereco_inserir_v1(character varying, character varying, character varying, character varying, character varying, character varying)
+    OWNER TO postgres;

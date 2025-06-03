@@ -1,0 +1,45 @@
+-- PROCEDURE: public.conta_aplicar_taxa_rendimento_v1(bigint)
+
+-- DROP PROCEDURE IF EXISTS public.conta_aplicar_taxa_rendimento_v1(bigint);
+
+CREATE OR REPLACE PROCEDURE public.conta_aplicar_taxa_rendimento_v1(
+	IN p_id_conta bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+    v_tipo_conta smallint;
+    v_tipo_cliente smallint;
+    v_id_cliente bigint;
+    v_taxa_rendimento double precision;
+BEGIN
+    -- Buscar tipo da conta e do cliente
+    SELECT conta.tipo_conta, conta.id_cliente, cliente.tipo
+    INTO v_tipo_conta, v_id_cliente, v_tipo_cliente
+    FROM conta
+    JOIN cliente ON cliente.id = conta.id_cliente
+    WHERE conta.id = p_id_conta;
+
+    -- Validar se é poupança (tipo 0)
+    IF v_tipo_conta != 0 THEN
+        RAISE EXCEPTION 'Conta informada não é uma conta poupança';
+    END IF;
+
+    -- Definir taxa com base no tipo de cliente
+    IF v_tipo_cliente = 0 THEN
+        v_taxa_rendimento := 0.005;
+    ELSIF v_tipo_cliente = 1 THEN
+        v_taxa_rendimento := 0.007;
+    ELSIF v_tipo_cliente = 2 THEN
+        v_taxa_rendimento := 0.009;
+    ELSE
+        RAISE EXCEPTION 'Tipo de cliente inválido';
+    END IF;
+
+    -- Aplicar rendimento ao saldo
+    UPDATE conta
+    SET saldo = saldo * (1 + v_taxa_rendimento)
+    WHERE id = p_id_conta;
+END;
+$BODY$;
+ALTER PROCEDURE public.conta_aplicar_taxa_rendimento_v1(bigint)
+    OWNER TO postgres;

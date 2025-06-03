@@ -1,0 +1,33 @@
+-- PROCEDURE: public.cartao_atualizar_senha_v1(bigint, bigint)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_atualizar_senha_v1(bigint, bigint);
+
+CREATE OR REPLACE PROCEDURE public.cartao_atualizar_senha_v1(
+	IN p_nova_senha bigint,
+	IN p_id bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    -- Verificações básicas
+    IF p_nova_senha IS NULL THEN
+        RAISE EXCEPTION 'A senha não pode ser nula';
+    END IF;
+
+    IF p_nova_senha < 0 THEN
+        RAISE EXCEPTION 'A senha não pode ser negativa';
+    END IF;
+
+    -- Atualiza a senha
+    UPDATE cartao
+    SET senha = p_nova_senha
+    WHERE id = p_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Cartão com ID % não encontrado', p_id;
+    END IF;
+
+    RAISE NOTICE 'Senha atualizada com sucesso para o cartão %', p_id;
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_atualizar_senha_v1(bigint, bigint)
+    OWNER TO postgres;

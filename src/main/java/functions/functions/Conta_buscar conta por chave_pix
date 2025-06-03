@@ -1,0 +1,31 @@
+-- FUNCTION: public.conta_por_chave_pix_v1(character varying)
+
+-- DROP FUNCTION IF EXISTS public.conta_por_chave_pix_v1(character varying);
+
+CREATE OR REPLACE FUNCTION public.conta_por_chave_pix_v1(
+	p_chave_pix character varying)
+    RETURNS TABLE(id bigint, chave_pix character varying, agencia bigint, numero bigint, tipo_conta smallint, saldo double precision, senha bigint, id_cliente bigint)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.chave_pix,
+        c.agencia,
+        c.numero,
+        c.tipo_conta,
+        c.saldo,
+        c.senha,
+        c.id_cliente
+    FROM conta c
+    WHERE c.chave_pix = p_chave_pix;
+END;
+$BODY$;
+
+ALTER FUNCTION public.conta_por_chave_pix_v1(character varying)
+    OWNER TO postgres;

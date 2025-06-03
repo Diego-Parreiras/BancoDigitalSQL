@@ -1,0 +1,23 @@
+-- FUNCTION: public.conta_find_by_agencia_and_numero_v1(bigint, bigint)
+
+-- DROP FUNCTION IF EXISTS public.conta_find_by_agencia_and_numero_v1(bigint, bigint);
+
+CREATE OR REPLACE FUNCTION public.conta_find_by_agencia_and_numero_v1(
+	p_agencia bigint,
+	p_numero bigint)
+    RETURNS TABLE(id bigint, agencia bigint, chave_pix character varying, numero bigint, saldo double precision, senha bigint, tipo_conta smallint, id_cliente bigint)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT * FROM conta as c
+    WHERE c.agencia = p_agencia AND c.numero = p_numero;
+END;
+$BODY$;
+
+ALTER FUNCTION public.conta_find_by_agencia_and_numero_v1(bigint, bigint)
+    OWNER TO postgres;

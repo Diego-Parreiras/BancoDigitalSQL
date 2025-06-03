@@ -1,0 +1,48 @@
+-- PROCEDURE: public.atualizar_cliente_v1(bigint, character varying, character varying, character varying, integer, character varying, character varying, character varying, character varying, character varying, character varying)
+
+-- DROP PROCEDURE IF EXISTS public.atualizar_cliente_v1(bigint, character varying, character varying, character varying, integer, character varying, character varying, character varying, character varying, character varying, character varying);
+
+CREATE OR REPLACE PROCEDURE public.atualizar_cliente_v1(
+	IN p_id_cliente bigint,
+	IN p_cpf character varying,
+	IN p_data_nascimento character varying,
+	IN p_nome character varying,
+	IN p_tipo integer,
+	IN p_cep character varying,
+	IN p_cidade character varying,
+	IN p_complemento character varying,
+	IN p_estado character varying,
+	IN p_numero character varying,
+	IN p_rua character varying)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+	v_id_endereco bigint;
+BEGIN
+
+SELECT id_endereco INTO v_id_endereco FROM cliente WHERE id = p_id_cliente;
+
+IF NOT FOUND THEN
+	RAISE EXCEPTION 'Cliente com id % não encontrado', p_id_cliente;
+END IF;
+
+UPDATE cliente SET
+	cpf = p_cpf,
+	data_nascimento = p_data_nascimento,
+	nome = p_nome,
+	tipo = p_tipo
+	WHERE id = p_id_cliente;
+
+UPDATE endereco SET
+	cep = p_cep,
+	cidade = p_cidade,
+	complemento = p_complemento,
+	estado = p_estado,
+	numero = p_numero,
+	rua = p_rua
+	WHERE id = v_id_endereco;
+
+END;
+$BODY$;
+ALTER PROCEDURE public.atualizar_cliente_v1(bigint, character varying, character varying, character varying, integer, character varying, character varying, character varying, character varying, character varying, character varying)
+    OWNER TO postgres;

@@ -1,0 +1,37 @@
+-- FUNCTION: public.cliente_find_by_id_v1(bigint)
+
+-- DROP FUNCTION IF EXISTS public.cliente_find_by_id_v1(bigint);
+
+CREATE OR REPLACE FUNCTION public.cliente_find_by_id_v1(
+	p_id bigint)
+    RETURNS TABLE(id_cliente bigint, nome character varying, cpf character varying, data_nascimento character varying, tipo smallint, id_endereco bigint, rua character varying, numero character varying, complemento character varying, cep character varying, cidade character varying, estado character varying)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+
+BEGIN
+RETURN QUERY
+SELECT
+        cliente.id,
+        cliente.nome,
+        cliente.cpf,
+        cliente.data_nascimento,
+        cliente.tipo,
+        endereco.id,
+        endereco.rua,
+        endereco.numero,
+        endereco.complemento,
+        endereco.cep,
+        endereco.cidade,
+        endereco.estado
+FROM cliente
+	JOIN endereco ON cliente.id_endereco= endereco.id WHERE cliente.id = p_id;
+
+END;
+$BODY$;
+
+ALTER FUNCTION public.cliente_find_by_id_v1(bigint)
+    OWNER TO postgres;

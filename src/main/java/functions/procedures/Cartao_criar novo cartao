@@ -1,0 +1,37 @@
+-- PROCEDURE: public.cartao_inserir_v1(bigint, boolean, bigint, bigint, bigint, smallint)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_inserir_v1(bigint, boolean, bigint, bigint, bigint, smallint);
+
+CREATE OR REPLACE PROCEDURE public.cartao_inserir_v1(
+	IN p_numero bigint,
+	IN p_ativo_ou_nao boolean,
+	IN p_senha bigint,
+	IN p_cvv bigint,
+	IN p_id_conta bigint,
+	IN p_tipo_cartao smallint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    -- Validações básicas (opcional)
+    IF p_numero IS NULL OR p_cvv IS NULL OR p_senha IS NULL THEN
+        RAISE EXCEPTION 'Número, senha e CVV são obrigatórios.';
+    END IF;
+
+    INSERT INTO cartao (
+	numero,
+	ativo_ou_nao,
+	senha,
+	cvv,
+	id_conta,
+	tipo_cartao)
+    VALUES (
+	p_numero,
+	p_ativo_ou_nao,
+	p_senha,
+	p_cvv,
+	p_id_conta,
+	p_tipo_cartao);
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_inserir_v1(bigint, boolean, bigint, bigint, bigint, smallint)
+    OWNER TO postgres;

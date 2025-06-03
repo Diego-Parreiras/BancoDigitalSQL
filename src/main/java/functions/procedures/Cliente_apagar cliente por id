@@ -1,0 +1,37 @@
+-- PROCEDURE: public.apagar_cliente_v1(bigint)
+
+-- DROP PROCEDURE IF EXISTS public.apagar_cliente_v1(bigint);
+
+CREATE OR REPLACE PROCEDURE public.apagar_cliente_v1(
+	IN p_id bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+	v_id_endereco INT;
+	v_id_contas INT[];
+BEGIN
+	-- Obter o ID do endereço do cliente
+	SELECT id_endereco INTO v_id_endereco
+	FROM cliente
+	WHERE cliente.id = p_id;
+
+	-- Obter os IDs de todas as contas do cliente
+	SELECT ARRAY(
+		SELECT conta.id FROM conta WHERE id_cliente = p_id
+	) INTO v_id_contas;
+
+	-- Apagar todos os cartões relacionados às contas do cliente
+	DELETE FROM cartao WHERE id_conta = ANY(v_id_contas);
+
+	-- Apagar todas as contas do cliente
+	DELETE FROM conta WHERE id_cliente = p_id;
+
+	-- Apagar o cliente
+	DELETE FROM cliente WHERE id = p_id;
+
+	-- Apagar o endereço (caso não seja usado por outro cliente)
+	DELETE FROM endereco WHERE id = v_id_endereco;
+END;
+$BODY$;
+ALTER PROCEDURE public.apagar_cliente_v1(bigint)
+    OWNER TO postgres;

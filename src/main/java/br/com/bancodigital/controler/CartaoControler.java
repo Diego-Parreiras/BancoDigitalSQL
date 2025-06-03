@@ -45,7 +45,7 @@ public class CartaoControler {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/aumenta-limite-debito/{id}")
+    @PutMapping("/aumentar-limite-debito/{id}")
     public ResponseEntity<?> aumentaLimiteDebito(@PathVariable Long id, @RequestBody double valor) {
         service.aumentarLimiteDebito(id, valor);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -70,8 +70,8 @@ public class CartaoControler {
     }
 
     @PostMapping("/pagar-fatura/{id}")
-    public ResponseEntity<?> pagarFatura(@PathVariable Long id) {
-        service.pagarFatura(id);
+    public ResponseEntity<?> pagarFatura(@PathVariable Long id, @RequestBody Long senha) {
+        service.pagarFatura(id,senha);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -1,0 +1,29 @@
+-- FUNCTION: public.cartao_por_numero_v1(character varying)
+
+-- DROP FUNCTION IF EXISTS public.cartao_por_numero_v1(character varying);
+
+CREATE OR REPLACE FUNCTION public.cartao_por_numero_v1(
+	p_numero character varying)
+    RETURNS TABLE(id bigint, numero character varying, validade date, tipo_cartao character varying, limite double precision, id_conta bigint)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id,
+        c.numero,
+        c.validade,
+        c.tipo_cartao,
+        c.limite,
+        c.id_conta
+    FROM cartao c
+    WHERE c.numero = p_numero;
+END;
+$BODY$;
+
+ALTER FUNCTION public.cartao_por_numero_v1(character varying)
+    OWNER TO postgres;

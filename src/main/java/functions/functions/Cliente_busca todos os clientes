@@ -1,0 +1,35 @@
+-- FUNCTION: public.cliente_find_all_v1()
+
+-- DROP FUNCTION IF EXISTS public.cliente_find_all_v1();
+
+CREATE OR REPLACE FUNCTION public.cliente_find_all_v1(
+	)
+    RETURNS TABLE(id_cliente bigint, nome character varying, cpf character varying, data_nascimento character varying, tipo smallint, id_endereco bigint, rua character varying, numero character varying, complemento character varying, cep character varying, cidade character varying, estado character varying)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT
+        c.id AS id_cliente,
+        c.nome,
+        c.cpf,
+        c.data_nascimento,
+        c.tipo,
+        e.id AS id_endereco,
+        e.rua,
+        e.numero,
+        e.complemento,
+        e.cep,
+        e.cidade,
+        e.estado
+    FROM cliente c
+    JOIN endereco e ON c.id_endereco = e.id;
+END;
+$BODY$;
+
+ALTER FUNCTION public.cliente_find_all_v1()
+    OWNER TO postgres;

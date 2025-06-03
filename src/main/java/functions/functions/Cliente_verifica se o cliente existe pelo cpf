@@ -1,0 +1,25 @@
+-- FUNCTION: public.cliente_exists_by_cpf_v1(text)
+
+-- DROP FUNCTION IF EXISTS public.cliente_exists_by_cpf_v1(text);
+
+CREATE OR REPLACE FUNCTION public.cliente_exists_by_cpf_v1(
+	p_cpf text)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+
+DECLARE
+	v_cpf BIGINT;
+BEGIN
+  SELECT COUNT(*) INTO v_cpf
+    FROM cliente
+    WHERE cpf = p_cpf;
+
+    RETURN v_cpf > 0;
+END;
+$BODY$;
+
+ALTER FUNCTION public.cliente_exists_by_cpf_v1(text)
+    OWNER TO postgres;

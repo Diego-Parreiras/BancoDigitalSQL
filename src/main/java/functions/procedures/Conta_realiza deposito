@@ -1,0 +1,28 @@
+-- PROCEDURE: public.conta_depositar_v1(bigint, double precision)
+
+-- DROP PROCEDURE IF EXISTS public.conta_depositar_v1(bigint, double precision);
+
+CREATE OR REPLACE PROCEDURE public.conta_depositar_v1(
+	IN p_id_conta bigint,
+	IN p_valor double precision)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    -- Verifica se o valor é positivo
+    IF p_valor <= 0 THEN
+        RAISE EXCEPTION 'Valor do depósito deve ser maior que zero. Valor recebido: %', p_valor;
+    END IF;
+
+    -- Verifica se a conta existe
+    IF NOT EXISTS (SELECT 1 FROM conta WHERE id = p_id_conta) THEN
+        RAISE EXCEPTION 'Conta com ID % não encontrada.', p_id_conta;
+    END IF;
+
+    -- Realiza o depósito
+    UPDATE conta
+    SET saldo = saldo + p_valor
+    WHERE id = p_id_conta;
+END;
+$BODY$;
+ALTER PROCEDURE public.conta_depositar_v1(bigint, double precision)
+    OWNER TO postgres;

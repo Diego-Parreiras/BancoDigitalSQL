@@ -1,0 +1,32 @@
+-- PROCEDURE: public.cartao_aumentar_limite_debito_v1(bigint, double precision)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_aumentar_limite_debito_v1(bigint, double precision);
+
+CREATE OR REPLACE PROCEDURE public.cartao_aumentar_limite_debito_v1(
+	IN p_id_cartao bigint,
+	IN p_novo_limite double precision)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+    -- Verifica se o valor é válido
+    IF p_novo_limite < 0 THEN
+        RAISE EXCEPTION 'Valor do limite diário não pode ser negativo';
+    END IF;
+
+    -- Verifica se o cartão é do tipo DÉBITO
+    IF NOT EXISTS (
+        SELECT 1
+        FROM cartao
+        WHERE id = p_id_cartao AND tipo_cartao = 'CartaoDeDebito'
+    ) THEN
+        RAISE EXCEPTION 'Cartão não é do tipo débito ou não existe';
+    END IF;
+
+    -- Atualiza o limite diário
+    UPDATE cartao
+    SET limite_diario = p_novo_limite
+    WHERE id = p_id_cartao;
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_aumentar_limite_debito_v1(bigint, double precision)
+    OWNER TO postgres;

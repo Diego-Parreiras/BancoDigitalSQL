@@ -1,0 +1,26 @@
+-- FUNCTION: public.endereco_ultimo_id_v1()
+
+-- DROP FUNCTION IF EXISTS public.endereco_ultimo_id_v1();
+
+CREATE OR REPLACE FUNCTION public.endereco_ultimo_id_v1(
+	)
+    RETURNS bigint
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
+DECLARE
+    v_id BIGINT;
+BEGIN
+    SELECT id
+    INTO v_id
+    FROM endereco
+    ORDER BY id DESC
+    LIMIT 1;
+
+    RETURN v_id;
+END;
+$BODY$;
+
+ALTER FUNCTION public.endereco_ultimo_id_v1()
+    OWNER TO postgres;

@@ -33,7 +33,7 @@ public class CartaoRowMapper implements RowMapper<Cartao> {
             throw new JavaException(ServiceUtils.CARTAO_NAO_ENCONTRADO + HttpStatus.NOT_FOUND.value());
         }
 
-        cartao.setId(rs.getLong("id_cartao"));
+        cartao.setId(rs.getLong("id"));
         cartao.setAtivoOuNao(rs.getBoolean("ativo_ou_nao"));
         cartao.setCvv(rs.getLong("cvv"));
         cartao.setNumero(rs.getLong("numero"));

@@ -173,35 +173,15 @@ public class ContaService {
     }
 
     public void aplicicarTaxaManutencao(Long id) {
-        /*aplica taxa de manutencao a conta corrente */
-       try {
            logger.info(ServiceUtils.APLICANDO_TAXA_MANUTENCAO);
-           Conta conta = buscarContaPorId(id);
            contaDao.aplicarTaxaManutencao(id);
-       }catch (Exception e) {
-           logger.info(ServiceUtils.CONTA_NAO_APLICAVEL);
-           throw new JavaException(ServiceUtils.CONTA_NAO_APLICAVEL, HttpStatus.BAD_REQUEST.value());
-       }
+           logger.info(ServiceUtils.SUCESSO);
     }
 
     public void aplicarTaxaRendimento(Long id) {
         logger.info(ServiceUtils.INICIANDO_TAXA_RENDIMENTO);
-        /*aplica taxa de rendimento a poupanca*/
-        Conta conta = buscarContaPorId(id);
-        if (conta.getTipoConta() == TipoConta.POUPANCA) {
-            if (conta.getCliente().getTipo() == TipoCliente.COMUM) {
-                conta.setSaldo(conta.getSaldo() + (conta.getSaldo() * 0.005));
-            } else if (conta.getCliente().getTipo() == TipoCliente.SUPER) {
-                conta.setSaldo(conta.getSaldo() + (conta.getSaldo() * 0.007));
-            } else if (conta.getCliente().getTipo() == TipoCliente.PREMIUM) {
-                conta.setSaldo(conta.getSaldo() + (conta.getSaldo() * 0.009));
-            }
-            contaDao.save(conta);
-            logger.info(ServiceUtils.SUCESSO);
-        } else {
-            logger.info(ServiceUtils.CONTA_NAO_APLICAVEL);
-            throw new JavaException(ServiceUtils.CONTA_NAO_APLICAVEL, HttpStatus.BAD_REQUEST.value());
-        }
+        contaDao.aplicarTaxaRendimento(id);
+        logger.info(ServiceUtils.SUCESSO);
     }
 
 

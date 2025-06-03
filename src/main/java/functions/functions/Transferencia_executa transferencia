@@ -1,0 +1,62 @@
+-- FUNCTION: public.transferencia_executar_v1(bigint, bigint, double precision)
+
+-- DROP FUNCTION IF EXISTS public.transferencia_executar_v1(bigint, bigint, double precision);
+
+CREATE OR REPLACE FUNCTION public.transferencia_executar_v1(
+	p_id_conta_origem bigint,
+	p_id_conta_destino bigint,
+	p_valor double precision)
+    RETURNS SETOF transferencia
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+    v_saldo_origem DOUBLE PRECISION;
+    v_data TIMESTAMP := NOW();
+    v_transferencia_id BIGINT;
+BEGIN
+    -- Validações
+    IF p_valor <= 0 THEN
+        RAISE EXCEPTION 'O valor da transferência deve ser maior que zero.';
+    END IF;
+
+    IF p_id_conta_origem = p_id_conta_destino THEN
+        RAISE EXCEPTION 'A conta de origem e a de destino não podem ser a mesma.';
+    END IF;
+
+    -- Verifica saldo e existência da conta de origem
+    SELECT saldo INTO v_saldo_origem FROM conta WHERE id = p_id_conta_origem;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Conta de origem (ID: %) não encontrada.', p_id_conta_origem;
+    END IF;
+
+    IF v_saldo_origem < p_valor THEN
+        RAISE EXCEPTION 'Saldo insuficiente na conta de origem. Saldo atual: %, valor: %', v_saldo_origem, p_valor;
+    END IF;
+
+    -- Verifica se a conta de destino existe
+    PERFORM 1 FROM conta WHERE id = p_id_conta_destino;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Conta de destino (ID: %) não encontrada.', p_id_conta_destino;
+    END IF;
+
+    -- Atualiza os saldos
+    UPDATE conta SET saldo = saldo - p_valor WHERE id = p_id_conta_origem;
+    UPDATE conta SET saldo = saldo + p_valor WHERE id = p_id_conta_destino;
+
+    -- Registra a transferência e captura o ID
+    INSERT INTO transferencia (data_transferencia, id_conta_origem, id_conta_destino, valor)
+    VALUES (v_data, p_id_conta_origem, p_id_conta_destino, p_valor)
+    RETURNING id INTO v_transferencia_id;
+
+    -- Retorna a transferência recém-criada
+    RETURN QUERY
+    SELECT * FROM transferencia WHERE id = v_transferencia_id;
+END;
+$BODY$;
+
+ALTER FUNCTION public.transferencia_executar_v1(bigint, bigint, double precision)
+    OWNER TO postgres;

@@ -25,6 +25,7 @@ public class CartaoService {
     CartaoDaoImplements cartaoDao;
     @Autowired
     ContaDaoImplements contadao;
+    private double fatura;
 
     private final Random random = new Random();
     private static final Logger logger = LoggerFactory.getLogger(CartaoService.class);
@@ -32,7 +33,6 @@ public class CartaoService {
     @Transactional
     public void novoCartao(Cartao cartao) {
         logger.info(ServiceUtils.CADASTRANDO_CARTAO);
-        validarDados(cartao);
         popularCartao(cartao);
         cartaoDao.save(cartao);
         logger.info(ServiceUtils.SUCESSO);
@@ -51,111 +51,47 @@ public class CartaoService {
     @Transactional
     public void pagar(long id, PagamentoCartaoRequest pagamento) {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
-        Cartao cartao = buscarId(id);
-        verStatus(cartao);
-        verificarValor(cartao, pagamento);
+        cartaoDao.pagar(id, pagamento);
+        logger.info(ServiceUtils.SUCESSO);
     }
 
     public void aumentarLimiteCredito(Long id, double valor) {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
-        if (valor < 0) {
-            logger.info(ServiceUtils.VALOR_NEGATIVO);
-            throw new JavaException(ServiceUtils.VALOR_NEGATIVO, HttpStatus.BAD_REQUEST.value());
-        }
-        Cartao cartao = buscarId(id);
-        verStatus(cartao);
-        if (cartao instanceof CartaoDeCredito) {
-            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO , cartao.getId());
-            ((CartaoDeCredito) cartao).setLimiteCredito(valor);
-            logger.info(ServiceUtils.SUCESSO);
-            return;
-        }
-        logger.info(ServiceUtils.CARTAO_NAO_E_CREDITO);
-        throw new JavaException(ServiceUtils.CARTAO_NAO_E_CREDITO, HttpStatus.BAD_REQUEST.value());
+        cartaoDao.aumentarLimiteCredito(id, valor);
+        logger.info(ServiceUtils.SUCESSO);
     }
 
     public void aumentarLimiteDebito(Long id, double valor) {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
-        if (valor < 0) {
-            logger.info(ServiceUtils.VALOR_NEGATIVO);
-            throw new JavaException(ServiceUtils.VALOR_NEGATIVO, HttpStatus.BAD_REQUEST.value());
-        }
-        Cartao cartao = buscarId(id);
-        verStatus(cartao);
-        if (cartao instanceof CartaoDeDebito) {
-            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO , cartao.getId());
-            ((CartaoDeDebito) cartao).setLimiteDiario(valor);
-            logger.info(ServiceUtils.SUCESSO);
-            return;
-        }
-        logger.info(ServiceUtils.CARTAO_NAO_E_DEBITO);
-        throw new JavaException(ServiceUtils.CARTAO_NAO_E_DEBITO, HttpStatus.BAD_REQUEST.value());
+        cartaoDao.aumentarLimiteDebito(id, valor);
+        logger.info(ServiceUtils.SUCESSO);
     }
 
     public void mudarStatus(Long id) {
         logger.info(ServiceUtils.MUDANDO_STATUS + id);
-        Cartao cartao = buscarId(id);
-        if (cartao instanceof CartaoDeCredito) {
-            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO ,cartao.getId());
-            if (((CartaoDeCredito) cartao).getFatura() != 0) {
-                logger.info(ServiceUtils.FATURA_PENDENTE);
-                throw new JavaException(ServiceUtils.FATURA_PENDENTE, HttpStatus.NOT_ACCEPTABLE.value());
-            }
-        }
-        cartao.setAtivoOuNao(!cartao.isAtivoOuNao());
-        cartaoDao.save(cartao);
+        cartaoDao.mudarStatus(id);
         logger.info(ServiceUtils.STATUS_ALTERADO);
     }
 
     public void atualizarSenha(Long id, long senha) {
         logger.info(ServiceUtils.ATUALIZANDO_SENHA + id);
-        Cartao cartao = buscarId(id);
-        cartao.setSenha(senha);
-        cartaoDao.save(cartao);
+        cartaoDao.atualizarSenha(id, senha);
         logger.info(ServiceUtils.SENHA_ATUALIZADA);
     }
 
     public double buscarFatura(Long id) {
         logger.info(ServiceUtils.BUSCANDO_FATURA + id);
-        Cartao cartao = buscarId(id);
-        if (cartao instanceof CartaoDeCredito) {
-            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO , cartao.getId());
-            return ((CartaoDeCredito) cartao).getFatura();
-        }
-        logger.info(ServiceUtils.CARTAO_NAO_E_CREDITO);
-        throw new JavaException(ServiceUtils.CARTAO_NAO_E_CREDITO, HttpStatus.NOT_FOUND.value());
+        fatura = cartaoDao.buscarFatura(id);
+        logger.info(ServiceUtils.SUCESSO);
+        return fatura;
     }
 
     @Transactional
-    public void pagarFatura(Long id) {
+    public void pagarFatura(Long id, Long senha) {
         logger.info(ServiceUtils.PAGANDO_FATURA, id);
-        Cartao cartao = buscarId(id);
-        if (cartao instanceof CartaoDeCredito) {
-            logger.info(ServiceUtils.CARTAO_DE_CREDITO_SELECIONADO , cartao.getId());
-            CartaoDeCredito cc = (CartaoDeCredito) cartao;
+        cartaoDao.pagarFatura(id , senha);
+        logger.info(ServiceUtils.SUCESSO);
 
-            if (cc.getFatura() == 0) {
-                logger.info(ServiceUtils.FATURA_JA_PAGA);
-                throw new JavaException(ServiceUtils.FATURA_JA_PAGA,HttpStatus.BAD_REQUEST.value());
-            }
-
-            if (cc.getFatura() >= cc.getLimiteCredito() * 0.8) {
-                cc.setFatura(cc.getFatura() + cc.getLimiteCredito() * 0.05);
-            }
-
-            if (cc.getFatura() > cartao.getConta().getSaldo()) {
-                logger.info(ServiceUtils.SALDO_INSUFICIENTE);
-                throw new JavaException(ServiceUtils.SALDO_INSUFICIENTE,HttpStatus.NOT_ACCEPTABLE.value());
-
-            }
-
-            cartao.getConta().setSaldo(cartao.getConta().getSaldo() - cc.getFatura());
-            cc.setFatura(0);
-            cartaoDao.save(cartao);
-            contadao.save(cartao.getConta());
-
-            logger.info(ServiceUtils.SUCESSO);
-        }
     }
 
     private void verStatus(Cartao cartao) {

@@ -51,23 +51,15 @@ public class ClienteService {
     @Transactional
     public void atualizar(Long id, Cliente cliente) {
         logger.info(ServiceUtils.ATUALIZANDO_CLIENTE);
-        Cliente clienteAtualizar = buscarId(id);
-        try {
-            validarNome(cliente.getNome());
-            validarCpf(cliente.getCpf());
-            validarDataDeNascimento(cliente.getDataNascimento());
-            validarEndereco(cliente.getEndereco());
-            clienteAtualizar.setNome(cliente.getNome());
-            clienteAtualizar.setCpf(cliente.getCpf());
-            clienteAtualizar.setDataNascimento(cliente.getDataNascimento());
-            clienteAtualizar.setEndereco(cliente.getEndereco());
-            clienteDao.save(clienteAtualizar);
-            logger.info(ServiceUtils.CLIENTE_ATUALIZADO);
-        } catch (Exception e) {
-            logger.info(ServiceUtils.CLIENTE_NAO_ATUALIZADO);
-            throw new JavaException(ServiceUtils.CLIENTE_NAO_ATUALIZADO, HttpStatus.BAD_REQUEST.value());
-        }
+        validarNome(cliente.getNome());
+        validarCpf(cliente.getCpf());
+        validarDataDeNascimento(cliente.getDataNascimento());
+        validarEndereco(cliente.getEndereco());
+        cliente.setId(id);
+        clienteDao.atualizar(cliente);
+        logger.info(ServiceUtils.CLIENTE_ATUALIZADO);
     }
+
 
     @Transactional
     public void apagar(Long id) {

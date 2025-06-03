@@ -141,9 +141,22 @@ public class ContaDaoImplements implements ContaDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_APLICAR_TAXA_MANUTENCAO,id);
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO","" );
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO+msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
 
+    }
+
+    @Override
+    public void aplicarTaxaRendimento(Long id) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_APLICAR_TAXA_RENDIMENTO,id);
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO","" );
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO+msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
     }
 
 

@@ -25,7 +25,7 @@ public class ClienteDaoImplements implements ClienteDao {
 
     @Override
     public boolean existsByCpf(String cpf) {
-        return  jdbcTemplate.queryForObject(SqlUtils.SQL_CLIENTE_EXISTS_BY_CPF, Boolean.class, cpf);
+        return jdbcTemplate.queryForObject(SqlUtils.SQL_CLIENTE_EXISTS_BY_CPF, Boolean.class, cpf);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ClienteDaoImplements implements ClienteDao {
                     cliente.getDataNascimento(),
                     cliente.getEndereco().getId(),
                     cliente.getTipo().getValor()
-                    );
+            );
             System.out.println(cliente.getTipo());
         } catch (Exception e) {
             System.out.println(cliente.getTipo());
@@ -67,4 +67,29 @@ public class ClienteDaoImplements implements ClienteDao {
             throw new JavaException(ServiceUtils.ERRO_AO_DELETAR, HttpStatus.NOT_FOUND.value());
         }
     }
+
+    @Override
+    public void atualizar(Cliente cliente) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CLIENTE_UPDATE,
+                    cliente.getId(),
+                    cliente.getCpf(),
+                    cliente.getDataNascimento(),
+                    cliente.getNome(),
+                    cliente.getTipo().getValor(),
+                    cliente.getEndereco().getCep(),
+                    cliente.getEndereco().getCidade(),
+                    cliente.getEndereco().getComplemento(),
+                    cliente.getEndereco().getEstado(),
+                    cliente.getEndereco().getNumero(),
+                    cliente.getEndereco().getRua()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            String msg = (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
+            throw new JavaException(ServiceUtils.ERRO_AO_ATUALIZAR + msg, HttpStatus.NOT_FOUND.value());
+        }
+    }
+
 }
+

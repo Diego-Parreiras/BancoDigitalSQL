@@ -1,0 +1,30 @@
+-- PROCEDURE: public.cliente_save_v1(character varying, character varying, character varying, bigint, integer)
+
+-- DROP PROCEDURE IF EXISTS public.cliente_save_v1(character varying, character varying, character varying, bigint, integer);
+
+CREATE OR REPLACE PROCEDURE public.cliente_save_v1(
+	IN p_nome character varying,
+	IN p_cpf character varying,
+	IN p_data_nascimento character varying,
+	IN p_id_endereco bigint,
+	IN p_tipo integer)
+LANGUAGE 'plpgsql'
+AS $BODY$
+BEGIN
+	INSERT INTO cliente (
+		nome,
+		cpf,
+		data_nascimento,
+		id_endereco,
+		tipo
+	) VALUES (
+		p_nome,
+		p_cpf,
+		p_data_nascimento,
+		p_id_endereco,
+		p_tipo
+	);
+END;
+$BODY$;
+ALTER PROCEDURE public.cliente_save_v1(character varying, character varying, character varying, bigint, integer)
+    OWNER TO postgres;

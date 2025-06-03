@@ -1,0 +1,33 @@
+-- FUNCTION: public.conta_find_all_cartao_v1(bigint)
+
+-- DROP FUNCTION IF EXISTS public.conta_find_all_cartao_v1(bigint);
+
+CREATE OR REPLACE FUNCTION public.conta_find_all_cartao_v1(
+	p_id_conta bigint)
+    RETURNS TABLE(id_cartao bigint, numero bigint, tipo_cartao character varying, ativo_ou_nao boolean, cvv bigint, senha bigint, fatura double precision, limite_credito double precision, limite_diario double precision, id_conta bigint) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        c.id,
+        c.numero,
+        c.tipo_cartao,
+        c.ativo_ou_nao,
+        c.cvv,
+        c.senha,
+		c.fatura,
+		c.limite_credito,
+		c.limite_diario,
+		c.id_conta
+    FROM cartao c
+    WHERE c.id_conta = p_id_conta;
+END;
+$BODY$;
+
+ALTER FUNCTION public.conta_find_all_cartao_v1(bigint)
+    OWNER TO postgres;

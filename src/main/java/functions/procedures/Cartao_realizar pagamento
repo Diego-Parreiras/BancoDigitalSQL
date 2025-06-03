@@ -1,0 +1,90 @@
+-- PROCEDURE: public.cartao_pagamento_v1(bigint, double precision, bigint)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_pagamento_v1(bigint, double precision, bigint);
+
+CREATE OR REPLACE PROCEDURE public.cartao_pagamento_v1(
+	IN p_id bigint,
+	IN p_valor double precision,
+	IN p_senha bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+    v_tipo VARCHAR(31);
+    v_status BOOLEAN;
+    v_senha BIGINT;
+    v_limite_credito DOUBLE PRECISION;
+    v_fatura DOUBLE PRECISION;
+    v_limite_diario DOUBLE PRECISION;
+    v_saldo DOUBLE PRECISION;
+    v_id_conta BIGINT;
+BEGIN
+    -- Busca dados do cartão
+    SELECT tipo_cartao, ativo_ou_nao, senha, limite_credito, fatura, limite_diario, id_conta
+    INTO v_tipo, v_status, v_senha, v_limite_credito, v_fatura, v_limite_diario, v_id_conta
+    FROM cartao
+    WHERE id = p_id;
+
+    -- Validação: cartão existe
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Cartão não encontrado';
+    END IF;
+
+    -- Validação: cartão ativo
+    IF v_status IS FALSE THEN
+        RAISE EXCEPTION 'Cartão inativo';
+    END IF;
+
+    -- Validação: senha
+    IF p_senha IS DISTINCT FROM v_senha THEN
+        RAISE EXCEPTION 'Senha incorreta';
+    END IF;
+
+    -- Validação: valor negativo
+    IF p_valor < 0 THEN
+        RAISE EXCEPTION 'Valor do pagamento não pode ser negativo';
+    END IF;
+
+    -- Cartão de crédito
+    IF v_tipo = 'CartaoDeCredito' THEN
+        IF p_valor > v_limite_credito THEN
+            RAISE EXCEPTION 'Limite de crédito insuficiente';
+        END IF;
+
+        -- Atualiza fatura (somar valor)
+        UPDATE cartao
+		SET fatura = COALESCE(v_fatura, 0) + p_valor
+		WHERE id = p_id;
+
+    -- Cartão de débito
+    ELSIF v_tipo = 'CartaoDeDebito' THEN
+        -- Buscar saldo da conta vinculada
+        SELECT saldo INTO v_saldo FROM conta WHERE id = v_id_conta;
+
+        IF p_valor > v_limite_diario THEN
+            RAISE EXCEPTION 'Limite diário insuficiente';
+        END IF;
+
+        IF p_valor > v_saldo THEN
+            RAISE EXCEPTION 'Saldo insuficiente';
+        END IF;
+
+        -- Atualiza limite diário e saldo da conta
+        UPDATE cartao
+        SET limite_diario = v_limite_diario - p_valor
+        WHERE id = p_id;
+
+        UPDATE conta
+        SET saldo = v_saldo - p_valor
+        WHERE id = v_id_conta;
+
+    ELSE
+        RAISE EXCEPTION 'Tipo de cartão inválido';
+    END IF;
+
+    -- Log fictício de sucesso
+    RAISE NOTICE 'Pagamento realizado com sucesso';
+
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_pagamento_v1(bigint, double precision, bigint)
+    OWNER TO postgres;

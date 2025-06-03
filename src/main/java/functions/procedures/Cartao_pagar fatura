@@ -1,0 +1,72 @@
+-- PROCEDURE: public.cartao_pagar_fatura_v1(bigint, bigint)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_pagar_fatura_v1(bigint, bigint);
+
+CREATE OR REPLACE PROCEDURE public.cartao_pagar_fatura_v1(
+	IN p_id bigint,
+	IN p_senha bigint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+    v_tipo VARCHAR(31);
+    v_fatura DOUBLE PRECISION;
+    v_limite_credito DOUBLE PRECISION;
+    v_saldo DOUBLE PRECISION;
+    v_id_conta BIGINT;
+    v_senha BIGINT;
+BEGIN
+    -- Buscar dados do cartão
+    SELECT tipo_cartao, fatura, limite_credito, id_conta, senha
+    INTO v_tipo, v_fatura, v_limite_credito, v_id_conta, v_senha
+    FROM cartao
+    WHERE id = p_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Cartão não encontrado';
+    END IF;
+
+    -- Valida senha
+    IF p_senha IS DISTINCT FROM v_senha THEN
+        RAISE EXCEPTION 'Senha incorreta';
+    END IF;
+
+    -- Verificar se é cartão de crédito
+    IF v_tipo != 'CartaoDeCredito' THEN
+        RAISE EXCEPTION 'Apenas cartões de crédito possuem fatura';
+    END IF;
+
+    -- Verificar se fatura já está paga
+    IF COALESCE(v_fatura, 0) = 0 THEN
+        RAISE EXCEPTION 'Fatura já está paga';
+    END IF;
+
+    -- Aplica multa de 5% se fatura >= 80% do limite
+    IF v_fatura >= v_limite_credito * 0.8 THEN
+        v_fatura := v_fatura + (v_limite_credito * 0.05);
+    END IF;
+
+    -- Buscar saldo da conta
+    SELECT saldo INTO v_saldo FROM conta WHERE id = v_id_conta;
+
+    -- Verifica se há saldo suficiente
+    IF v_fatura > v_saldo THEN
+        RAISE EXCEPTION 'Saldo insuficiente para pagar a fatura';
+    END IF;
+
+    -- Debita saldo da conta
+    UPDATE conta
+    SET saldo = saldo - v_fatura
+    WHERE id = v_id_conta;
+
+    -- Zera fatura
+    UPDATE cartao
+    SET fatura = 0
+    WHERE id = p_id;
+
+    -- Log fictício
+    RAISE NOTICE 'Fatura paga com sucesso';
+
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_pagar_fatura_v1(bigint, bigint)
+    OWNER TO postgres;

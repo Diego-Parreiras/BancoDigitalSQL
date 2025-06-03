@@ -3,6 +3,7 @@ package br.com.bancodigital.dao.daoimplements;
 import br.com.bancodigital.dao.interfaces.CartaoDao;
 import br.com.bancodigital.constantutils.SqlUtils;
 import br.com.bancodigital.exception.JavaException;
+import br.com.bancodigital.model.dto.PagamentoCartaoRequest;
 import br.com.bancodigital.model.entity.Cartao;
 import br.com.bancodigital.model.rowmapper.CartaoRowMapper;
 import br.com.bancodigital.constantutils.ServiceUtils;
@@ -22,8 +23,9 @@ public class CartaoDaoImplements implements CartaoDao {
 
     @Override
     public boolean existsByNumero(Long numero) {
-        Integer count = jdbcTemplate.queryForObject(SqlUtils.SQL_CARTAO_EXISTS_BY_NUMERO, Integer.class, numero);
-        return count != null && count > 0;
+
+        Boolean count = jdbcTemplate.queryForObject(SqlUtils.SQL_CARTAO_EXISTS_BY_NUMERO, Boolean.class, numero);
+        return count != null && count != false;
     }
 
     @Override
@@ -44,19 +46,97 @@ public class CartaoDaoImplements implements CartaoDao {
     }
 
     @Override
-    public void save(Cartao cartao) {
+    public void mudarStatus(Long id) {
         try {
-            jdbcTemplate.update(SqlUtils.SQL_CARTAO_SAVE,
-                    cartao.getNumero(),
-                    cartao.isAtivoOuNao(),
-                    cartao.getSenha(),
-                    cartao.getCvv(),
-                    cartao.getConta().getId(),
-                    cartao.getClass().getSimpleName());
-
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_MUDAR_STATUS, id);
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR, HttpStatus.NOT_ACCEPTABLE.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
+    @Override
+    public double buscarFatura(Long id) {
+        try {
+            return jdbcTemplate.queryForObject(SqlUtils.SQL_CARTAO_BUSCAR_FATURA, Double.class, id);
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+    }
+
+    @Override
+    public void pagar(long id, PagamentoCartaoRequest pagamento) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_PAGAR, id ,pagamento.getPagamento(),pagamento.getSenha() );
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+    }
+
+    @Override
+    public void pagarFatura(Long id, Long senha) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_PAGAR_FATURA, id ,senha);
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+
+    }
+
+    @Override
+    public void atualizarSenha(Long id, long senha) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_ATUALIZAR_SENHA, senha, id);
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+    }
+
+    @Override
+    public void aumentarLimiteDebito(Long id, double valor) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_AUMENTAR_LIMITE_DEBITO, id, valor);
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+    }
+
+    @Override
+        public void save (Cartao cartao){
+            try {
+                jdbcTemplate.update(SqlUtils.SQL_CARTAO_SAVE,
+                        cartao.getNumero(),
+                        cartao.isAtivoOuNao(),
+                        cartao.getSenha(),
+                        cartao.getCvv(),
+                        cartao.getConta().getId(),
+                        cartao.getTipoCartao());
+
+            } catch (Exception e) {
+                String msg = e.getCause().getMessage();
+                msg = msg.replace("ERRO", "");
+                throw new JavaException(ServiceUtils.ERRO_AO_SALVAR + msg, HttpStatus.NOT_ACCEPTABLE.value());
+            }
+        }
+
+    public void aumentarLimiteCredito(Long id, double valor) {
+        try {
+            jdbcTemplate.update(SqlUtils.SQL_CARTAO_AUMENTAR_LIMITE_CREDITO, id, valor);
+        } catch (Exception e) {
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
+        }
+    }
 }

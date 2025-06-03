@@ -23,4 +23,6 @@ public interface ContaDao {
     Transferencia tranferir(Long idOrigem, Long idDestino, double valor);
 
     void aplicarTaxaManutencao(Long id);
+
+    void aplicarTaxaRendimento(Long id);
 }

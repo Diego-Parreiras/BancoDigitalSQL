@@ -1,0 +1,49 @@
+-- PROCEDURE: public.cartao_aumentar_limite_credito_v1(bigint, double precision)
+
+-- DROP PROCEDURE IF EXISTS public.cartao_aumentar_limite_credito_v1(bigint, double precision);
+
+CREATE OR REPLACE PROCEDURE public.cartao_aumentar_limite_credito_v1(
+	IN p_id bigint,
+	IN p_novo_limite double precision)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+    v_tipo VARCHAR(31);
+    v_status BOOLEAN;
+BEGIN
+    -- Validação: valor negativo
+    IF p_novo_limite < 0 THEN
+        RAISE EXCEPTION 'O valor do limite não pode ser negativo';
+    END IF;
+
+    -- Busca tipo e status do cartão
+    SELECT tipo_cartao, ativo_ou_nao
+    INTO v_tipo, v_status
+    FROM cartao
+    WHERE id = p_id;
+
+    -- Validação: cartão existe
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Cartão com ID % não encontrado', p_id;
+    END IF;
+
+    -- Validação: cartão ativo
+    IF v_status IS FALSE THEN
+        RAISE EXCEPTION 'Cartão está inativo';
+    END IF;
+
+    -- Verificação: se é de crédito
+    IF v_tipo <> 'CartaoDeCredito' THEN
+        RAISE EXCEPTION 'Este cartão não é do tipo CartaoDeCredito';
+    END IF;
+
+    -- Atualiza o limite de crédito
+    UPDATE cartao
+    SET limite_credito = p_novo_limite
+    WHERE id = p_id;
+
+    RAISE NOTICE 'Limite de crédito atualizado com sucesso';
+END;
+$BODY$;
+ALTER PROCEDURE public.cartao_aumentar_limite_credito_v1(bigint, double precision)
+    OWNER TO postgres;

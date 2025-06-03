@@ -17,5 +17,15 @@ public class Cartao {
 
     @JsonBackReference
     private Conta conta;
+    public short getTipoCartao() {
+        if (this instanceof CartaoDeDebito) {
+            return 1; // Debito
+        } else if (this instanceof CartaoDeCredito) {
+            return 2; // Credito
+        } else {
+            throw new IllegalArgumentException("Tipo de cartão desconhecido");
+        }
+    }
+
 
 }
