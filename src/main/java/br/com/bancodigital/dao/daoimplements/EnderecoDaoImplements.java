@@ -30,7 +30,8 @@ public class EnderecoDaoImplements implements EnderecoDao {
             return jdbcTemplate.queryForObject(SqlUtils.SQL_BUSCAR_ID_ULTIMO_ENDERECO, Long.class);
 
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR_ENDERECO, HttpStatus.NOT_ACCEPTABLE.value());
-        }
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR + msg, HttpStatus.NOT_ACCEPTABLE.value());        }
     }
 }

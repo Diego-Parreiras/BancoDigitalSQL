@@ -53,7 +53,9 @@ public class ContaDaoImplements implements ContaDao {
                     conta.getTipoConta().getValor(),
                     conta.getCliente().getId());
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR, HttpStatus.NOT_ACCEPTABLE.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -62,7 +64,9 @@ public class ContaDaoImplements implements ContaDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CONTA_DELETE, id);
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.ERRO_AO_DELETAR, HttpStatus.NOT_FOUND.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.ERRO_AO_DELETAR + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -79,8 +83,9 @@ public class ContaDaoImplements implements ContaDao {
             conta.setListaCartoes(listaDeCartaoes);
             return Optional.of(conta);
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_ENCONTRADO + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -90,8 +95,9 @@ public class ContaDaoImplements implements ContaDao {
             Conta conta = jdbcTemplate.queryForObject(SqlUtils.SQL_CONTA_FIND_BY_PIX, contaRowMapper, chavePix);
             return Optional.of(conta);
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_ENCONTRADO + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -101,8 +107,9 @@ public class ContaDaoImplements implements ContaDao {
             Conta conta = jdbcTemplate.queryForObject(SqlUtils.SQL_CONTA_FIND_BY_AGENCIA_NUMERO, contaRowMapper, agencia, numero);
             return Optional.of(conta);
         } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_ENCONTRADO + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -111,7 +118,9 @@ public class ContaDaoImplements implements ContaDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CONTA_DEPOSITAR,id, valor);
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
 
     }
@@ -121,8 +130,9 @@ public class ContaDaoImplements implements ContaDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CONTA_SACAR, id,valor);
         } catch (Exception e) {
-            System.out.println("=== ERRO REAL: " + e.getClass().getSimpleName() + " ===");
-            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -132,8 +142,9 @@ public class ContaDaoImplements implements ContaDao {
             Transferencia transferencia = jdbcTemplate.queryForObject(SqlUtils.SQL_TRANSFERENCIA_SAVE ,transferenciaRowMapper,idOrigem,idDestino,valor);
             return transferencia;
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO, HttpStatus.NOT_ACCEPTABLE.value());
-        }
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.NAO_FOI_POSSIVEL_REALIZAR_ACAO + msg, HttpStatus.NOT_ACCEPTABLE.value());        }
     }
 
     @Override

@@ -31,8 +31,6 @@ public class ClienteDaoImplements implements ClienteDao {
     @Override
     public void save(Cliente cliente) {
         try {
-            System.out.println(cliente.getTipo());
-
             jdbcTemplate.update(SqlUtils.SQL_CLIENTE_SAVE,
                     cliente.getNome(),
                     cliente.getCpf(),
@@ -40,11 +38,11 @@ public class ClienteDaoImplements implements ClienteDao {
                     cliente.getEndereco().getId(),
                     cliente.getTipo().getValor()
             );
-            System.out.println(cliente.getTipo());
+
         } catch (Exception e) {
-            System.out.println(cliente.getTipo());
-            e.printStackTrace();
-            throw new JavaException(/*ServiceUtils.ERRO_AO_SALVAR*/e.getMessage(), HttpStatus.NOT_ACCEPTABLE.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.ERRO_AO_SALVAR + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -64,7 +62,9 @@ public class ClienteDaoImplements implements ClienteDao {
         try {
             jdbcTemplate.update(SqlUtils.SQL_CLIENTE_DELETE, id);
         } catch (Exception e) {
-            throw new JavaException(ServiceUtils.ERRO_AO_DELETAR, HttpStatus.NOT_FOUND.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.ERRO_AO_DELETAR + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
@@ -85,9 +85,9 @@ public class ClienteDaoImplements implements ClienteDao {
                     cliente.getEndereco().getRua()
             );
         } catch (Exception e) {
-            e.printStackTrace();
-            String msg = (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
-            throw new JavaException(ServiceUtils.ERRO_AO_ATUALIZAR + msg, HttpStatus.NOT_FOUND.value());
+            String msg = e.getCause().getMessage();
+            msg = msg.replace("ERRO", "");
+            throw new JavaException(ServiceUtils.ERRO_AO_ATUALIZAR + msg, HttpStatus.NOT_ACCEPTABLE.value());
         }
     }
 
