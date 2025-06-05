@@ -36,8 +36,8 @@ public class ContaDaoImplements implements ContaDao {
     @Autowired
     private TransferenciaRowMapper transferenciaRowMapper;
 
-
     private final Logger logger = LoggerFactory.getLogger(ContaDaoImplements.class);
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime dataTransferencia = LocalDateTime.now();
 
@@ -50,7 +50,7 @@ public class ContaDaoImplements implements ContaDao {
                     conta.getNumero(),
                     conta.getSaldo(),
                     conta.getSenha(),
-                    conta.getTipoConta().ordinal(),
+                    conta.getTipoConta().getValor(),
                     conta.getCliente().getId());
         } catch (Exception e) {
             throw new JavaException(ServiceUtils.ERRO_AO_SALVAR, HttpStatus.NOT_ACCEPTABLE.value());

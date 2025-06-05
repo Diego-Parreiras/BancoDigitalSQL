@@ -18,7 +18,7 @@ public class SqlUtils {
     public static final String SQL_CONTA_INSERT = "CALL public.conta_save_v1(?, ?, ?, ?, ?, ?, ?)";
     public static final String SQL_CONTA_DELETE = "CALL public.apagar_conta_v1(?)";
     public static final String SQL_CONTA_FIND_BY_ID = "SELECT * FROM conta_find_by_id_v1(?)";
-    public static final String SQL_CONTA_FIND_ALL_CARTOES = "SELECT * FROM conta_find_all_cartao_v1(?)";
+    public static final String SQL_CONTA_FIND_ALL_CARTOES =" SELECT * FROM conta_find_all_cartao_v1(?)";
     public static final String SQL_CONTA_FIND_BY_PIX = "SELECT * FROM conta_por_chave_pix_v1(?)";
     public static final String SQL_CONTA_FIND_BY_AGENCIA_NUMERO = "SELECT * FROM conta_find_by_agencia_and_numero_v1(?,?);";
     public static final String SQL_CONTA_DEPOSITAR = "CALL conta_depositar_v1(?,?)";

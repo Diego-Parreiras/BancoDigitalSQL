@@ -121,7 +121,7 @@ public class CartaoDaoImplements implements CartaoDao {
                         cartao.getSenha(),
                         cartao.getCvv(),
                         cartao.getConta().getId(),
-                        cartao.getTipoCartao());
+                        cartao.getClass().getSimpleName());
 
             } catch (Exception e) {
                 String msg = e.getCause().getMessage();
