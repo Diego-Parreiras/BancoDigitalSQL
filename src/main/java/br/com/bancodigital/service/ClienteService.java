@@ -9,6 +9,7 @@ import br.com.bancodigital.constantutils.ServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,9 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@CacheConfig(cacheNames = "Cliente")
 public class ClienteService {
     @Autowired
     private ClienteDaoImplements clienteDao;
@@ -27,6 +30,7 @@ public class ClienteService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClienteService.class);
 
+    @CacheEvict(allEntries = true)
     @Transactional
     public void cadastrar(Cliente cliente) {
         logger.info(ServiceUtils.CADASTRANDO_CLIENTE);
@@ -37,6 +41,7 @@ public class ClienteService {
         logger.info(ServiceUtils.CLIENTE_CADASTRADO);
     }
 
+    @Cacheable(key = "#id")
     public Cliente buscarId(Long id) {
         logger.info(ServiceUtils.BUSCANDO_CLIENTE);
         Optional<Cliente> cliente = clienteDao.findById(id);
@@ -48,6 +53,10 @@ public class ClienteService {
         throw new JavaException(ServiceUtils.NAO_ENCONTRADO, HttpStatus.NOT_FOUND.value());
     }
 
+    @Caching(
+            put = {@CachePut(key = "#id")},
+            evict = {@CacheEvict(allEntries = true)}
+    )
     @Transactional
     public void atualizar(Long id, Cliente cliente) {
         logger.info(ServiceUtils.ATUALIZANDO_CLIENTE);
@@ -60,7 +69,10 @@ public class ClienteService {
         logger.info(ServiceUtils.CLIENTE_ATUALIZADO);
     }
 
-
+    @Caching(evict = {
+            @CacheEvict(key = "#id"),
+            @CacheEvict(allEntries = true)
+    })
     @Transactional
     public void apagar(Long id) {
         logger.info(ServiceUtils.REMOVENDO_CLIENTE);
@@ -73,7 +85,8 @@ public class ClienteService {
         clienteDao.delete(optional.get().getId());
     }
 
-    public Object buscarTodos() {
+    @Cacheable
+    public List<Cliente> buscarTodos() {
         logger.info(ServiceUtils.BUSCANDO_TODOS);
         return clienteDao.findAll();
     }

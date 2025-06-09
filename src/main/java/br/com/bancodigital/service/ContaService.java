@@ -14,6 +14,7 @@ import br.com.bancodigital.constantutils.ServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +24,17 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
+@CacheConfig(cacheNames = "Conta")
 public class ContaService {
     @Autowired
-    private final ContaDao contaDao = new ContaDaoImplements();
+    private ContaDao contaDao;
     @Autowired
-    private final TransferenciaDaoImplements transferenciaDao = new TransferenciaDaoImplements();
+    private TransferenciaDaoImplements transferenciaDao;
 
     private final Logger logger = LoggerFactory.getLogger(ContaService.class);
     private final Random random = new Random();
 
+    @CacheEvict(allEntries = true)
     @Transactional
     public void criarConta(Conta conta) {
         try {
@@ -44,7 +47,7 @@ public class ContaService {
             e.printStackTrace();
         }
     }
-
+    @CacheEvict(allEntries = true)
     @Transactional
     public Transferencia transferenciaPix(TransferenciaPixRequest request) {
         /*verifica se o valor existe e se a conta origem existe
@@ -75,7 +78,7 @@ public class ContaService {
         logger.info(ServiceUtils.CONTA_DESTINO_ENCONTRADA);
         throw new JavaException(ServiceUtils.CONTA_DESTINO_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
     }
-
+    @CacheEvict(allEntries = true)
     @Transactional
     public Transferencia transferenciaTed(TransferenciaTedRequest request) {
         /*mesma logica apenas usando agencia e numero da conta*/
@@ -102,7 +105,10 @@ public class ContaService {
         logger.info(ServiceUtils.CONTA_ORGEM_NAO_ENCONTRADA);
         throw new JavaException(ServiceUtils.CONTA_ORGEM_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
     }
-
+    @Caching(evict = {
+            @CacheEvict(key = "#id"),
+            @CacheEvict(allEntries = true)
+    })
     @Transactional
     public void fecharConta(Long id) {
         /*procura conta e se existir verifica se o saldo e 0 para fechar a conta*/
@@ -121,7 +127,6 @@ public class ContaService {
             throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
         }
     }
-
     public double exibirSaldo(Long id) {
         logger.info(ServiceUtils.CONSULTANDO_SALDO);
         Conta conta = buscarContaPorId(id);
@@ -133,7 +138,7 @@ public class ContaService {
         throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
 
     }
-
+    @CacheEvict(allEntries = true)
     public void depositar(Long id, double valor) {
         logger.info(ServiceUtils.INICIANDO_DEPOSITO);
         varificarValor(valor);
@@ -146,7 +151,7 @@ public class ContaService {
             throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
         }
     }
-
+    @CacheEvict(allEntries = true)
     public void sacar(Long id, double valor) {
         logger.info(ServiceUtils.INICIANDO_SACAR);
         varificarValor(valor);
@@ -160,7 +165,7 @@ public class ContaService {
             throw new JavaException(ServiceUtils.CONTA_NAO_ENCONTRADA, HttpStatus.NOT_FOUND.value());
         }
     }
-
+    @Cacheable(key = "#id")
     public Conta buscarContaPorId(Long id) {
         logger.info(ServiceUtils.INICIANDO_BUSCA);
         Optional<Conta> conta = contaDao.findById(id);
@@ -171,13 +176,13 @@ public class ContaService {
         logger.info(ServiceUtils.CONTA_ENCONTRADA);
         return conta.get();
     }
-
+    @CacheEvict(allEntries = true)
     public void aplicicarTaxaManutencao(Long id) {
            logger.info(ServiceUtils.APLICANDO_TAXA_MANUTENCAO);
            contaDao.aplicarTaxaManutencao(id);
            logger.info(ServiceUtils.SUCESSO);
     }
-
+    @CacheEvict(allEntries = true)
     public void aplicarTaxaRendimento(Long id) {
         logger.info(ServiceUtils.INICIANDO_TAXA_RENDIMENTO);
         contaDao.aplicarTaxaRendimento(id);

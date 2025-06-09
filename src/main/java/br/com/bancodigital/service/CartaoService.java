@@ -10,6 +10,10 @@ import br.com.bancodigital.model.dto.PagamentoCartaoRequest;
 import br.com.bancodigital.model.enuns.TipoCliente;
 import br.com.bancodigital.constantutils.ServiceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -20,6 +24,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @Service
+@CacheConfig(cacheNames = "Cartao")
 public class CartaoService {
     @Autowired
     CartaoDaoImplements cartaoDao;
@@ -31,6 +36,7 @@ public class CartaoService {
     private static final Logger logger = LoggerFactory.getLogger(CartaoService.class);
 
     @Transactional
+    @CacheEvict(allEntries = true)
     public void novoCartao(Cartao cartao) {
         logger.info(ServiceUtils.CADASTRANDO_CARTAO);
         popularCartao(cartao);
@@ -38,47 +44,55 @@ public class CartaoService {
         logger.info(ServiceUtils.SUCESSO);
     }
 
+    @Cacheable(key = "#id")
     public Cartao buscarId(Long id) {
         logger.info(ServiceUtils.INICIANDO_BUSCA);
         Optional<Cartao> cartaoOptional = cartaoDao.findById(id);
         if (!cartaoOptional.isPresent()) {
             logger.info(ServiceUtils.CARTAO_NAO_ENCONTRADO);
-            throw new JavaException(ServiceUtils.CARTAO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND.value());        }
+            throw new JavaException(ServiceUtils.CARTAO_NAO_ENCONTRADO, HttpStatus.NOT_FOUND.value());
+        }
         logger.info(ServiceUtils.SUCESSO);
         return cartaoOptional.get();
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"Cartao", "Fatura", "Conta"}, allEntries = true)
     public void pagar(long id, PagamentoCartaoRequest pagamento) {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
         cartaoDao.pagar(id, pagamento);
         logger.info(ServiceUtils.SUCESSO);
     }
 
+    @CacheEvict(allEntries = true)
     public void aumentarLimiteCredito(Long id, double valor) {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
         cartaoDao.aumentarLimiteCredito(id, valor);
         logger.info(ServiceUtils.SUCESSO);
     }
 
+    @CacheEvict(allEntries = true)
     public void aumentarLimiteDebito(Long id, double valor) {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
         cartaoDao.aumentarLimiteDebito(id, valor);
         logger.info(ServiceUtils.SUCESSO);
     }
 
+    @CacheEvict(allEntries = true)
     public void mudarStatus(Long id) {
         logger.info(ServiceUtils.MUDANDO_STATUS + id);
         cartaoDao.mudarStatus(id);
         logger.info(ServiceUtils.STATUS_ALTERADO);
     }
 
+    @CacheEvict(allEntries = true)
     public void atualizarSenha(Long id, long senha) {
         logger.info(ServiceUtils.ATUALIZANDO_SENHA + id);
         cartaoDao.atualizarSenha(id, senha);
         logger.info(ServiceUtils.SENHA_ATUALIZADA);
     }
 
+    @Cacheable(value = "Fatura", key = "#id")
     public double buscarFatura(Long id) {
         logger.info(ServiceUtils.BUSCANDO_FATURA + id);
         fatura = cartaoDao.buscarFatura(id);
@@ -87,9 +101,13 @@ public class CartaoService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "Cartao", allEntries = true),
+            @CacheEvict(value = "Fatura", key = "#id")
+    })
     public void pagarFatura(Long id, Long senha) {
         logger.info(ServiceUtils.PAGANDO_FATURA, id);
-        cartaoDao.pagarFatura(id , senha);
+        cartaoDao.pagarFatura(id, senha);
         logger.info(ServiceUtils.SUCESSO);
 
     }
@@ -107,11 +125,11 @@ public class CartaoService {
         logger.info(ServiceUtils.VERIFICANDO_DADOS_DO_PAGAMENTO);
         if (!pagamento.getSenha().equals(cartao.getSenha())) {
             logger.info(ServiceUtils.SENHA_INCORRETA);
-            throw new JavaException(ServiceUtils.SENHA_INCORRETA,HttpStatus.UNAUTHORIZED.value());
+            throw new JavaException(ServiceUtils.SENHA_INCORRETA, HttpStatus.UNAUTHORIZED.value());
         }
         if (pagamento.getPagamento() < 0) {
             logger.info(ServiceUtils.VALOR_NEGATIVO);
-            throw new JavaException(ServiceUtils.VALOR_NEGATIVO,HttpStatus.NOT_ACCEPTABLE.value());
+            throw new JavaException(ServiceUtils.VALOR_NEGATIVO, HttpStatus.NOT_ACCEPTABLE.value());
         }
 
         if (cartao instanceof CartaoDeCredito) {
@@ -126,7 +144,7 @@ public class CartaoService {
             logger.info(ServiceUtils.SUCESSO);
 
         } else if (cartao instanceof CartaoDeDebito) {
-            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO ,cartao.getId());
+            logger.info(ServiceUtils.CARTAO_DE_DEBITO_SELECIONADO, cartao.getId());
 
             if (pagamento.getPagamento() > ((CartaoDeDebito) cartao).getLimiteDiario()) {
                 logger.info(ServiceUtils.LIMITE_INSUFICIENTE);
@@ -163,12 +181,5 @@ public class CartaoService {
         }
 
         logger.info(ServiceUtils.SUCESSO);
-    }
-
-    private void validarDados(Cartao cartao) {
-        logger.info(ServiceUtils.CADASTRANDO_CARTAO);
-        if (cartaoDao.existsByNumero(cartao.getNumero())) {
-            throw new JavaException(ServiceUtils.CARTAO_JA_CADASTRADO,HttpStatus.CONFLICT.value());
-        }
     }
 }

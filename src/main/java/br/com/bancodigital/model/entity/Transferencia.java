@@ -6,13 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Transferencia {
-
+public class Transferencia implements Serializable {
+    private static final long serialVersionUID = 1L;  // numero de serial para caso de futuras alterações
     private Long id;
     private Long idContaOrigem;
     private Long idContaDestino;

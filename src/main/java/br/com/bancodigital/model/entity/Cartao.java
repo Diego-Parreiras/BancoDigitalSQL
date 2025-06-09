@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Cartao {
+public class Cartao implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Long id;
     private Long numero;
     private boolean ativoOuNao;
@@ -26,6 +29,7 @@ public class Cartao {
             throw new IllegalArgumentException("Tipo de cartão desconhecido");
         }
     }
+
 
 
 }
